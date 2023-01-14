@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-
 @NoArgsConstructor
 @Getter
 @Entity
@@ -31,4 +30,5 @@ public class Statement {
         this.record = record;
         this.record_img = record_img;
     }
+
 }
