@@ -37,8 +37,7 @@ public class User {
     private Date modified;
 
     @Builder
-    public User(Long id, String email, Platform platform, String nickname, String profile, Date created) {
-        this.id = id;
+    public User(String email, Platform platform, String nickname, String profile, Date created) {
         this.email = email;
         this.platform = platform;
         this.nickname = nickname;
