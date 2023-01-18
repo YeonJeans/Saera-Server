@@ -14,10 +14,10 @@ public class StatementTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private Set<Statement> statement;
+    @ManyToOne
+    private Statement statement;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private Set<Tag> tag;
+    @ManyToOne
+    private Tag tag;
 
 }

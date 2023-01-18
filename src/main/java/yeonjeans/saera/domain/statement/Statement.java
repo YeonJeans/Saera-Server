@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -24,11 +25,13 @@ public class Statement {
     @Column(nullable = false)
     private String record_img;
 
+    @OneToMany(mappedBy = "tag")
+    private List<StatementTag> statementTag;
+
     @Builder
     public Statement(String content, String record, String record_img) {
         this.content = content;
         this.record = record;
         this.record_img = record_img;
     }
-
 }
