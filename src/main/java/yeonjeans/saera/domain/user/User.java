@@ -44,4 +44,10 @@ public class User {
         this.profile = profile;
         this.created = created;
     }
+
+    public void updateXp(int xp){
+    }
+
+    public void  updateUser(){
+    }
 }
