@@ -1,9 +1,13 @@
 package yeonjeans.saera.domain.statement;
 
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
+@NoArgsConstructor
+@Entity
 public class StatementTag {
 
     @Id
@@ -11,14 +15,9 @@ public class StatementTag {
     private Long id;
 
     @OneToMany(fetch = FetchType.LAZY)
-    final Statement statement;
+    private Set<Statement> statement;
 
     @OneToMany(fetch = FetchType.LAZY)
-    final Tag tag;
+    private Set<Tag> tag;
 
-    @Builder
-    public StatementTag(Statement statement, Tag tag) {
-        this.statement = statement;
-        this.tag = tag;
-    }
 }
