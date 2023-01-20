@@ -1,8 +1,10 @@
-package yeonjeans.saera.domain.statement;
+package yeonjeans.saera.domain.practiced;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import yeonjeans.saera.domain.BaseTimeEntity;
+import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.user.User;
 
 import javax.persistence.*;
@@ -10,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Practiced {
+public class Practiced extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
