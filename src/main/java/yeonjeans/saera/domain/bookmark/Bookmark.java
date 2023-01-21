@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.user.User;
+import yeonjeans.saera.domain.user.Member;
 
 import javax.persistence.*;
 
@@ -19,14 +19,14 @@ public class Bookmark extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Statement statement;
 
     @Builder
-    public Bookmark(User user, Statement statement) {
-        this.user = user;
+    public Bookmark(Member member, Statement statement) {
+        this.member = member;
         this.statement = statement;
     }
 }

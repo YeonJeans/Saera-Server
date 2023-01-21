@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @NoArgsConstructor
 @Getter
 @Entity
-public class User extends BaseTimeEntity {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +31,7 @@ public class User extends BaseTimeEntity {
     private int xp;
 
     @Builder
-    public User(String email, Platform platform, String nickname, String profile) {
+    public Member(String email, Platform platform, String nickname, String profile) {
         this.email = email;
         this.platform = platform;
         this.nickname = nickname;

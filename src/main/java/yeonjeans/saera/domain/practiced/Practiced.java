@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.user.User;
+import yeonjeans.saera.domain.user.Member;
 
 import javax.persistence.*;
 
@@ -19,7 +19,7 @@ public class Practiced extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Statement statement;
@@ -33,14 +33,14 @@ public class Practiced extends BaseTimeEntity {
     private Boolean is_practiced;
 
     @Builder
-    public Practiced(User user, Statement statement) {
-        this.user = user;
+    public Practiced(Member member, Statement statement) {
+        this.member =member;
         this.statement = statement;
     }
 
     @Builder
-    public Practiced(User user, Statement statement, String record, String record_img, Integer accuracy, Boolean is_practiced) {
-        this.user = user;
+    public Practiced(Member member, Statement statement, String record, String record_img, Integer accuracy, Boolean is_practiced) {
+        this.member = member;
         this.statement = statement;
         this.record = record;
         this.record_img = record_img;
