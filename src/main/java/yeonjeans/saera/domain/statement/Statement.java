@@ -38,4 +38,5 @@ public class Statement {
         this.graphX = graphX;
         this.graphY = graphY;
     }
+
 }
