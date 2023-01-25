@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -19,8 +18,8 @@ public class Tag {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "statement")
-    private List<StatementTag> statementTag = new ArrayList<>();
+    @OneToMany(mappedBy = "tag")
+    private List<StatementTag> statements;
 
     public Tag(String name) {
         this.name = name;

@@ -22,16 +22,20 @@ public class Statement {
     @Column(nullable = false)
     private String record;
 
-    @Column(nullable = false)
-    private String record_img;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String graphX;
 
-    @OneToMany(mappedBy = "tag")
-    private List<StatementTag> statementTag;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String graphY;
+
+    @OneToMany(mappedBy = "statement")
+    private List<StatementTag> tags;
 
     @Builder
-    public Statement(String content, String record, String record_img) {
+    public Statement(String content, String record, String graphX, String graphY) {
         this.content = content;
         this.record = record;
-        this.record_img = record_img;
+        this.graphX = graphX;
+        this.graphY = graphY;
     }
 }
