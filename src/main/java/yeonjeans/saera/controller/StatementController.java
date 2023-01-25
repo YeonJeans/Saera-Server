@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.StatementServiceImpl;
 import yeonjeans.saera.domain.statement.Statement;
+import yeonjeans.saera.domain.statement.StatementTag;
 import yeonjeans.saera.dto.StatementResponseDto;
 
 import java.util.List;
@@ -48,9 +49,11 @@ public class StatementController {
                     .map(StatementResponseDto::new)
                     .collect(Collectors.toList());
         }else if(tag!=null){
-            list = statementService.searchByTag(tag).stream()
-                    .map(StatementResponseDto::new)
-                    .collect(Collectors.toList());
+          list = statementService.searchByTag(tag).getStatements().stream()
+                   .map(StatementTag::getStatement)
+                   .map(StatementResponseDto::new)
+                   .collect(Collectors.toList());
+
         }else{
             list = statementService.getList().stream()
                     .map(StatementResponseDto::new)

@@ -27,15 +27,10 @@ public class StatementServiceImpl implements StatementService {
     }
 
     @Override
-    public List<Statement> searchByTag(String keyword) {
-        Tag tag = tagRepository.findByName(keyword);
-        if(tag!=null){
-            return statementRepository.findByTag(tag.getId());
-        }else{
-            return statementRepository.findByTag(0L);
-        }
-
+    public Tag searchByTag(String tag) {
+        return tagRepository.findByName(tag);
     }
+
 
     @Override
     public List<Statement> getList() {

@@ -2,6 +2,7 @@ package yeonjeans.saera.dto;
 
 import lombok.Data;
 import yeonjeans.saera.domain.statement.Statement;
+import yeonjeans.saera.domain.statement.Tag;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ public class StatementResponseDto {
     private String record;
     private String graphX;
     private String graphY;
+    private boolean isPracticed;
 
     List<String> tags;
 
@@ -24,4 +26,5 @@ public class StatementResponseDto {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
     }
+
 }
