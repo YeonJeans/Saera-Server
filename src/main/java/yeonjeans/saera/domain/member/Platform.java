@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain.user;
+package yeonjeans.saera.domain.member;
 
 public enum Platform {
     GOOGLE,
