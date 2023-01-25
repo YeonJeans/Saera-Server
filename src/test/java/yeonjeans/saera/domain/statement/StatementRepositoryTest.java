@@ -31,7 +31,6 @@ public class StatementRepositoryTest {
         statementRepository.save(Statement.builder()
                 .content(content)
                 .record(record)
-                .record_img(recordImg)
                 .build());
 
         //when

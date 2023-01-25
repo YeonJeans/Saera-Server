@@ -40,6 +40,7 @@ public class StatementController {
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tag", required = false) String tag){
 
+        System.out.println("Content: "+content+"/tag: "+tag);
         List<StatementResponseDto> list;
 
         if(content!=null){
@@ -47,7 +48,7 @@ public class StatementController {
                     .map(StatementResponseDto::new)
                     .collect(Collectors.toList());
         }else if(tag!=null){
-            list = statementService.getList().stream()
+            list = statementService.searchByTag(tag).stream()
                     .map(StatementResponseDto::new)
                     .collect(Collectors.toList());
         }else{
