@@ -26,11 +26,13 @@ public class Practiced extends BaseTimeEntity {
 
     private String record;
 
-    private String record_img;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String graphX;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String graphY;
 
     private Integer accuracy;
-
-    private Boolean is_practiced;
 
     @Builder
     public Practiced(Member member, Statement statement) {
@@ -39,12 +41,12 @@ public class Practiced extends BaseTimeEntity {
     }
 
     @Builder
-    public Practiced(Member member, Statement statement, String record, String record_img, Integer accuracy, Boolean is_practiced) {
+    public Practiced(Member member, Statement statement, String record, String graphX, String graphY, Integer accuracy) {
         this.member = member;
         this.statement = statement;
         this.record = record;
-        this.record_img = record_img;
+        this.graphX = graphX;
+        this.graphY = graphY;
         this.accuracy = accuracy;
-        this.is_practiced = is_practiced;
     }
 }

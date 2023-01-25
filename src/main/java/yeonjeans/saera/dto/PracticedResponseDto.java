@@ -1,25 +1,34 @@
 package yeonjeans.saera.dto;
 
+import yeonjeans.saera.domain.practiced.Practiced;
 import yeonjeans.saera.domain.statement.Statement;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class PracticedResponseDto {
-    private String content;
-    private String record;
-    private String graphX;
-    private String graphY;
+    String content;
+    LocalDateTime date;
+    Integer accuracy;
+    String graph_x;
+    String graph_y;
+    String record;
 
-    List<String> tags;
+    Long statement_id;
+    Long practiced_id;
 
-    public PracticedResponseDto(Statement state) {
+    public PracticedResponseDto(Practiced practiced) {
+        this.practiced_id = practiced.getId();
+
+        this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
+        this.accuracy = practiced.getAccuracy();
+        this.graph_x = practiced.getGraphX();
+        this.graph_y = practiced.getGraphY();
+        this.record = practiced.getRecord();
+
+        Statement state = practiced.getStatement();
         this.content = state.getContent();
-        this.record = state.getRecord();
-        this.graphX = state.getGraphX();
-        this.graphY = state.getGraphY();
-        this.tags = state.getTags().stream()
-                .map(statementTag -> statementTag.getTag().getName())
-                .collect(Collectors.toList());
+        this.statement_id = state.getId();
     }
 }

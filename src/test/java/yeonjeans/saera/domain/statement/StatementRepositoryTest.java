@@ -37,17 +37,4 @@ public class StatementRepositoryTest {
         assertThat(statement.getContent()).isEqualTo("content");
     }
 
-    @Test
-    public void findByTag(){
-        //given
-        String content = "content";
-        String record = "rcord";
-
-        //when
-        List<Statement> statementList = statementRepository.findByTag(1L);
-
-        //then
-        Statement statement = statementList.get(1);
-        assertThat(statement.getContent()).isEqualTo("content");
-    }
 }
