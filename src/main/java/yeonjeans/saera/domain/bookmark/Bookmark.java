@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.user.Member;
+import yeonjeans.saera.domain.member.Member;
 
 import javax.persistence.*;
 
