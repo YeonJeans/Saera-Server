@@ -28,17 +28,26 @@ public class StatementRepositoryTest {
         String record = "rcord";
         String recordImg = "record";
 
-        statementRepository.save(Statement.builder()
-                .content(content)
-                .record(record)
-                .record_img(recordImg)
-                .build());
 
         //when
         List<Statement> statementList = statementRepository.findAll();
 
         //then
         Statement statement = statementList.get(0);
+        assertThat(statement.getContent()).isEqualTo("content");
+    }
+
+    @Test
+    public void findByTag(){
+        //given
+        String content = "content";
+        String record = "rcord";
+
+        //when
+        List<Statement> statementList = statementRepository.findByTag(1L);
+
+        //then
+        Statement statement = statementList.get(1);
         assertThat(statement.getContent()).isEqualTo("content");
     }
 }
