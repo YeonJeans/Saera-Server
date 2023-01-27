@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.bookmark.Bookmark;
+import yeonjeans.saera.domain.practiced.Practiced;
 
 import javax.persistence.*;
 import java.util.List;
@@ -34,6 +35,9 @@ public class Statement {
 
     @OneToMany(mappedBy = "statement")
     private List<Bookmark> bookmarks;
+
+    @OneToMany(mappedBy = "statement")
+    private List<Practiced> practiceds;
 
     @Builder
     public Statement(String content, String record, String graphX, String graphY) {

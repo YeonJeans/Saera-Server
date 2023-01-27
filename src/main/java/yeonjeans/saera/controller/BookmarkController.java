@@ -11,9 +11,9 @@ import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.statement.StatementRepository;
 import yeonjeans.saera.dto.BookmarkResponseDto;
-import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.dto.StateListItemDto;
 
-import javax.swing.text.html.Option;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,12 +28,12 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" })
     @GetMapping("/statements/bookmark")
-    public ResponseEntity returnBookmarkList(){
+    public ResponseEntity<?> returnBookmarkList(){
         Optional<Member> member = memberRepository.findById(1L);
         if(member.isPresent()){
-            List<BookmarkResponseDto> list = bookmarkRepository.findAllByMember(member.get())
+            List<StateListItemDto> list = bookmarkRepository.findAllByMember(member.get())
                     .stream()
-                    .map(BookmarkResponseDto::new)
+                    .map(StateListItemDto::new)
                     .collect(Collectors.toList());
             return ResponseEntity.ok().body(list);
         }else {
@@ -43,7 +43,7 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 생성", description = "즐겨찾기 추가", tags = { "Bookmark Controller" })
     @PostMapping("/statements/{id}/bookmark")
-    public ResponseEntity createBookmark(@PathVariable Long id){
+    public ResponseEntity<?> createBookmark(@PathVariable Long id){
         Optional<Member> member = memberRepository.findById(1L);
         Optional<Statement> state = statementRepository.findById(id);
         if(member.isPresent()&&state.isPresent()){
@@ -52,7 +52,7 @@ public class BookmarkController {
                             .statement(state.get())
                             .member(member.get())
                             .build());
-            return ResponseEntity.accepted().body(new BookmarkResponseDto(bookmark));
+            return ResponseEntity.ok().body(new BookmarkResponseDto(bookmark));
         }else {
             return ResponseEntity.internalServerError().build();
         }
@@ -60,7 +60,7 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 삭제", tags = { "Bookmark Controller" })
     @DeleteMapping("/statements/bookmark/{id}")
-    public ResponseEntity deleteBookmark(@PathVariable Long id){
+    public ResponseEntity<?> deleteBookmark(@PathVariable Long id){
         Optional<Bookmark> bookmark = bookmarkRepository.findById(id);
         if(bookmark.isPresent()){
             bookmarkRepository.delete(bookmark.get());

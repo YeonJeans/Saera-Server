@@ -11,24 +11,11 @@ import java.util.stream.Collectors;
 
 @Data
 public class BookmarkResponseDto {
-    String content;
-    List<String> tags;
-    LocalDateTime date;
     Long statement_id;
     Long bookmark_id;
 
     public BookmarkResponseDto(Bookmark bookmark) {
         this.bookmark_id = bookmark.getId();
-        if(bookmark.getModifiedDate()!=null) {
-            this.date = bookmark.getModifiedDate();
-        }else{
-            this.date = bookmark.getCreatedDate();
-        }
-        Statement state = bookmark.getStatement();
-        this.content = state.getContent();
-        this.tags = state.getTags().stream()
-                .map(statementTag -> statementTag.getTag().getName())
-                .collect(Collectors.toList());
-        this.statement_id = state.getId();
+        this.statement_id = bookmark.getStatement().getId();
     }
 }
