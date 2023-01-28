@@ -1,6 +1,7 @@
 package yeonjeans.saera.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,7 +31,7 @@ public class StatementController {
 
     @Operation(summary = "문장 세부 조회", description = "id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
                     @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
             })
     @GetMapping("/statements/{id}")
@@ -47,7 +48,7 @@ public class StatementController {
 
     @Operation(summary = "문장 검색", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class)))
+                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
             }
     )
     @GetMapping("/statements")
@@ -61,7 +62,7 @@ public class StatementController {
             list = statementService.searchByContent(content).stream()
                     .map(StatementResponseDto::new)
                     .collect(Collectors.toList());
-        }else if(!tags.isEmpty()){
+        }else if(tags!=null){
             list = tags.stream().map(statementService::searchByTag)
                     .map(Tag::getStatements)
                     .flatMap(Collection::stream)

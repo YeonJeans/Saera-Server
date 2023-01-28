@@ -1,5 +1,6 @@
 package yeonjeans.saera.dto;
 
+import lombok.Data;
 import yeonjeans.saera.domain.practiced.Practiced;
 import yeonjeans.saera.domain.statement.Statement;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Data
 public class PracticedResponseDto {
     String content;
     LocalDateTime date;

@@ -1,6 +1,9 @@
 package yeonjeans.saera.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import yeonjeans.saera.domain.practiced.PracticedRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
+import yeonjeans.saera.dto.StatementResponseDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +30,8 @@ public class PracticedController {
 
     @Operation(summary = "학습한 문장 조회", description = "학습한 문장 리스트가 제공됩니다.", tags = { "Practiced Controller" },
             responses = {
-            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
             @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
         }
     )
@@ -46,7 +51,7 @@ public class PracticedController {
 
     @Operation(summary = "학습정보만 조회", description = "practiced_id를 통해 학습정보를 제공합니다..(학습진행후)", tags = { "Practiced Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
                     @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
             }
     )
