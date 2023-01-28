@@ -1,6 +1,7 @@
 package yeonjeans.saera.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,12 @@ public class BookmarkController {
     private final MemberRepository memberRepository;
     private final StatementRepository statementRepository;
 
-    @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" })
+    @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+            }
+    )
     @GetMapping("/statements/bookmark")
     public ResponseEntity<?> returnBookmarkList(){
         Optional<Member> member = memberRepository.findById(1L);
@@ -41,7 +47,11 @@ public class BookmarkController {
         }
     }
 
-    @Operation(summary = "즐겨찾기 생성", description = "즐겨찾기 추가", tags = { "Bookmark Controller" })
+    @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+            }
+    )
     @PostMapping("/statements/{id}/bookmark")
     public ResponseEntity<?> createBookmark(@PathVariable Long id){
         Optional<Member> member = memberRepository.findById(1L);
@@ -58,7 +68,11 @@ public class BookmarkController {
         }
     }
 
-    @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 삭제", tags = { "Bookmark Controller" })
+    @Operation(summary = "즐겨찾기 삭제", description = "bookmark_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+            }
+    )
     @DeleteMapping("/statements/bookmark/{id}")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long id){
         Optional<Bookmark> bookmark = bookmarkRepository.findById(id);
@@ -66,7 +80,7 @@ public class BookmarkController {
             bookmarkRepository.delete(bookmark.get());
             return ResponseEntity.ok().build();
         }else{
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         }
 
     }

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 @Data
 public class StatementResponseDto {
+    private Long id;
     private String content;
     private String record;
     private String graphX;
@@ -17,6 +18,7 @@ public class StatementResponseDto {
     private Long bookmark_id;
 
     public StatementResponseDto(Statement state) {
+        this.id = state.getId();
         this.content = state.getContent();
         this.record = state.getRecord();
         this.graphX = state.getGraphX();
