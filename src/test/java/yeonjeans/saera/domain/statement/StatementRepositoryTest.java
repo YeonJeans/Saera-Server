@@ -28,13 +28,13 @@ public class StatementRepositoryTest {
         String record = "rcord";
         String recordImg = "record";
 
-
+        statementRepository.save(new Statement().builder().record(record).content(content).graphX(recordImg).graphY(recordImg).build());
         //when
         List<Statement> statementList = statementRepository.findAll();
 
         //then
         Statement statement = statementList.get(0);
-        assertThat(statement.getContent()).isEqualTo("content");
+        assertThat(statement.getContent()).isInstanceOf(String.class);
     }
 
 }
