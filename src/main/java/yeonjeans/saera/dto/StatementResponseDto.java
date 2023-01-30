@@ -15,7 +15,7 @@ public class StatementResponseDto {
     private String graphY;
 
     List<String> tags;
-    private Long bookmark_id;
+    private Long bookmarked;
 
     public StatementResponseDto(Statement state) {
         this.id = state.getId();
@@ -27,11 +27,11 @@ public class StatementResponseDto {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
         try{
-            this.bookmark_id = state.getBookmarks().stream()
+            this.bookmarked = state.getBookmarks().stream()
                     .filter(bookmark -> bookmark.getMember().getId().equals(1L))
                     .findFirst().orElseThrow().getId();
         }catch (NoSuchElementException exception){
-            this.bookmark_id = null;
+            this.bookmarked = null;
         }
     }
 

@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 @Data
 public class BookmarkResponseDto {
     Long statement_id;
-    Long bookmark_id;
+    Long bookmarked;
 
     public BookmarkResponseDto(Bookmark bookmark) {
-        this.bookmark_id = bookmark.getId();
+        this.bookmarked = bookmark.getId();
         this.statement_id = bookmark.getStatement().getId();
     }
 }

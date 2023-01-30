@@ -17,12 +17,12 @@ public class StateListItemDto {
     private LocalDateTime date;
 
     private Long statement_id;
-    private Long practiced_id;
-    private Long bookmark_id;
+    private Long practiced;
+    private Long bookmarked;
 
 
     public StateListItemDto(Practiced practiced) {
-        this.practiced_id = practiced.getId();
+        this.practiced = practiced.getId();
 
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
 
@@ -33,11 +33,11 @@ public class StateListItemDto {
                 .collect(Collectors.toList());
         this.statement_id = state.getId();
         try{
-            this.bookmark_id = state.getBookmarks().stream()
+            this.bookmarked = state.getBookmarks().stream()
                     .filter(bookmark -> bookmark.getMember().getId().equals(1L))
                     .findFirst().orElseThrow().getId();
         }catch (NoSuchElementException exception){
-            this.bookmark_id = null;
+            this.bookmarked = null;
         }
     }
 
@@ -49,16 +49,16 @@ public class StateListItemDto {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
         this.statement_id = state.getId();
-        this.bookmark_id = bookmark.getId();
+        this.bookmarked = bookmark.getId();
         try{
             Practiced practiced = state.getPracticeds().stream()
                     .filter(practice -> practice.getMember().getId().equals(1L))
                     .findFirst().orElseThrow();
-            this.practiced_id = practiced.getId();
+            this.practiced = practiced.getId();
             this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
         }catch (NoSuchElementException exception){
             this.date = null;
-            this.practiced_id = null;
+            this.practiced = null;
         }
 
     }
