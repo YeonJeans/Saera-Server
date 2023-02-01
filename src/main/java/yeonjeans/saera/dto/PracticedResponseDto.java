@@ -1,6 +1,8 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 import yeonjeans.saera.domain.practiced.Practiced;
 import yeonjeans.saera.domain.statement.Statement;
 
@@ -13,21 +15,19 @@ public class PracticedResponseDto {
     String content;
     LocalDateTime date;
     Integer accuracy;
-    String graph_x;
-    String graph_y;
-    String record;
+    String pitch_x;
+    String pitch_y;
 
     Long statement_id;
-    Long practiced_id;
+    Long practiced;
 
     public PracticedResponseDto(Practiced practiced) {
-        this.practiced_id = practiced.getId();
+        this.practiced= practiced.getId();
 
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
         this.accuracy = practiced.getAccuracy();
-        this.graph_x = practiced.getGraphX();
-        this.graph_y = practiced.getGraphY();
-        this.record = practiced.getRecord();
+        this.pitch_x = practiced.getGraphX();
+        this.pitch_y = practiced.getGraphY();
 
         Statement state = practiced.getStatement();
         this.content = state.getContent();

@@ -1,33 +1,15 @@
 package yeonjeans.saera.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.practiced.Practiced;
-import yeonjeans.saera.domain.statement.Statement;
 
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class PracticedRequestDto {
-    private Member member;
-    private Statement statement;
-
-    private String record;
-    private String graphX;
-    private String graphY;
-
-    private Integer accuracy;
-
-    @Builder
-    public PracticedRequestDto(String record) {
-    }
-
-    public Practiced toEntity() {
-        return null;
-    }
+    private Long id;
+    private MultipartFile record;
 }

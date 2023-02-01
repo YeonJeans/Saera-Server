@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
+import yeonjeans.saera.domain.Record;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.member.Member;
 
@@ -24,7 +25,8 @@ public class Practiced extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Statement statement;
 
-    private String record;
+    @OneToOne
+    private Record record;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String graphX;
@@ -36,12 +38,12 @@ public class Practiced extends BaseTimeEntity {
 
     @Builder
     public Practiced(Member member, Statement statement) {
-        this.member =member;
+        this.member = member;
         this.statement = statement;
     }
 
     @Builder
-    public Practiced(Member member, Statement statement, String record, String graphX, String graphY, Integer accuracy) {
+    public Practiced(Member member, Statement statement, Record record, String graphX, String graphY, Integer accuracy) {
         this.member = member;
         this.statement = statement;
         this.record = record;

@@ -6,8 +6,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import yeonjeans.saera.Service.PracticedServiceImpl;
+import yeonjeans.saera.domain.RecordRepository;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.practiced.Practiced;
@@ -15,8 +21,8 @@ import yeonjeans.saera.domain.practiced.PracticedRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
-import yeonjeans.saera.dto.StatementResponseDto;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +33,8 @@ public class PracticedController {
 
     private final PracticedRepository practicedRepository;
     private final MemberRepository memberRepository;
+    private final RecordRepository recordRepository;
+    private final PracticedServiceImpl practicedService;
 
     @Operation(summary = "학습한 문장 조회", description = "학습한 문장 리스트가 제공됩니다.", tags = { "Practiced Controller" },
             responses = {
@@ -49,6 +57,29 @@ public class PracticedController {
         }
     }
 
+    @Operation(summary = "유저 음성 파일 조회", description = "practiced_id를 통해 유저의 음성 녹음 파일을 제공합니다.", tags = { "Practiced Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+            }
+    )
+    @GetMapping("/practiced/record/{id}")
+    public ResponseEntity returnPracticedRecord(@PathVariable Long id){
+        Optional<Practiced> practiced = practicedRepository.findById(id);
+        if(practiced.isPresent()){
+            String path = practiced.get().getRecord().getPath();
+
+            Resource resource1 = new FileSystemResource(path);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("audio", "wav"));
+            //headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            return ResponseEntity.ok().headers(headers).body(resource1);
+        }else{
+            return ResponseEntity.noContent().build();
+        }
+    }
+
     @Operation(summary = "학습정보만 조회", description = "practiced_id를 통해 학습정보를 제공합니다..(학습진행후)", tags = { "Practiced Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
@@ -66,14 +97,26 @@ public class PracticedController {
     }
 
     @Operation(summary = "학습 정보 생성", description = "statement_id를 사용하여 학습 정보 생성합니다.", tags = { "Practiced Controller" })
-    @PostMapping("/statements/{id}/practiced")
-    public ResponseEntity createPracticed(@PathVariable Long id, @RequestBody PracticedRequestDto requestDto){
-        return null;
+    @PostMapping("/practiced")
+    public ResponseEntity createPracticed(@ModelAttribute PracticedRequestDto dto){
+        Practiced practiced = practicedService.create(dto);
+        if(practiced!=null){
+            return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @Operation(summary = "학습 정보 업데이트", description = "학습 정보 업데이트(복습)", tags = { "Practiced Controller" })
-    @PatchMapping("/statements/practiced/{id}")
-    public ResponseEntity updatedPracticed(@PathVariable Long id, @RequestBody PracticedRequestDto requestDto){
-        return null;
+    @PatchMapping("/practiced")
+    public ResponseEntity updatedPracticed(@ModelAttribute PracticedRequestDto dto){
+        Practiced practiced = practicedService.update(dto);
+        if(practiced!=null){
+            return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
     }
+
 }

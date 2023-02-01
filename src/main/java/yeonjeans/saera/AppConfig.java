@@ -2,6 +2,7 @@ package yeonjeans.saera;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.Service.StatementServiceImpl;
 import yeonjeans.saera.Service.MemberService;
@@ -27,4 +28,9 @@ public class AppConfig {
         return new MemberServiceImpl(userRepository);
     }
 
+    @Bean
+    public WebClient webClient() {
+        return WebClient
+                .create("http://34.64.207.59/");
+    }
 }
