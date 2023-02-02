@@ -36,46 +36,7 @@ public class PracticedServiceImpl {
     private final String uploadPath = Paths.get(System.getProperty("user.home")).resolve("upload").toString();
 
     @Transactional
-    public Practiced create(PracticedRequestDto dto) {
-        //Memeber
-        Optional<Member> member = memberRepository.findById(1L);
-        if(member.isEmpty())return null;
-        //statement
-        Optional<Statement> statement = statementRepository.findById(dto.getId());
-        if(statement.isEmpty()){
-            System.out.println("찾을 수 없는 문장 id");
-            return null;
-        }
-        if(practicedRepository.existsByStatementAndMember(statement.get(), member.get())){
-            System.out.print("patch method 로 다시 요청 바람.");
-            return null;
-        }
-
-        //file 저장하고
-        MultipartFile file = dto.getRecord();
-        String originalName = file.getOriginalFilename();
-        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
-
-        String folderPath = makeFolder();
-        String uuid = UUID.randomUUID().toString();
-
-        String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" +fileName;
-        Path savePath = Paths.get(saveName);
-
-        try{
-            file.transferTo(savePath);
-        }catch (IOException e){
-            System.out.println("ioexception");
-            return null;
-        }
-        Record record = recordRepository.save(Record.builder().path(saveName).build());
-
-        Practiced practiced = new Practiced(member.get(), statement.get(), record, "pitch_x", "pitch_y", 80);
-
-        return practicedRepository.save(practiced);
-    }
-
-    public Practiced update(PracticedRequestDto dto){
+    public Practiced create(PracticedRequestDto dto){
         //Memeber
         Optional<Member> member = memberRepository.findById(1L);
         if(member.isEmpty())return null;
@@ -86,29 +47,26 @@ public class PracticedServiceImpl {
             return null;
         }
 
-        if(!practicedRepository.existsByStatementAndMember(statement.get(), member.get())){
-            System.out.print("Post method 로 다시 요청 바람.");
-            return null;
-        }
-        Practiced oldPrac = practicedRepository.findById(dto.getId()).get();
-        String oldPath = oldPrac.getRecord().getPath();
-        practicedRepository.delete(oldPrac);
-        recordRepository.delete(oldPrac.getRecord());
-
-
-        //file 저장하고
-        MultipartFile file = dto.getRecord();
-        String originalName = file.getOriginalFilename();
-        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
-
-        String folderPath = makeFolder();
-        String uuid = UUID.randomUUID().toString();
-
-        String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" +fileName;
-        Path savePath = Paths.get(saveName);
-
-        try{
+        Optional<Practiced> oldPrac = practicedRepository.findById(dto.getId());
+        if(oldPrac.isPresent()){
+            String oldPath = oldPrac.get().getRecord().getPath();
+            practicedRepository.delete(oldPrac.get());
+            recordRepository.delete(oldPrac.get().getRecord());
             new File(oldPath).deleteOnExit();
+        }
+
+        //file 저장하고
+        MultipartFile file = dto.getRecord();
+        String originalName = file.getOriginalFilename();
+        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
+
+        String folderPath = makeFolder();
+        String uuid = UUID.randomUUID().toString();
+
+        String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" +fileName;
+        Path savePath = Paths.get(saveName);
+
+        try{
             file.transferTo(savePath);
         }catch (IOException e){
             System.out.println("ioexception");

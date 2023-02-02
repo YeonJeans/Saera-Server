@@ -22,7 +22,6 @@ import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,8 +62,8 @@ public class PracticedController {
                     @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
             }
     )
-    @GetMapping("/practiced/record/{id}")
-    public ResponseEntity returnPracticedRecord(@PathVariable Long id){
+    @GetMapping("/record/{id}")
+    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id){
         Optional<Practiced> practiced = practicedRepository.findById(id);
         if(practiced.isPresent()){
             String path = practiced.get().getRecord().getPath();
@@ -87,7 +86,7 @@ public class PracticedController {
             }
     )
     @GetMapping("/practiced/{id}")
-    public ResponseEntity returnPracticed(@PathVariable Long id){
+    public ResponseEntity returnPracticed(@PathVariable(required = false) Long id){
         Optional<Practiced> practiced = practicedRepository.findById(id);
         if(practiced.isPresent()){
             return ResponseEntity.ok().body(new PracticedResponseDto(practiced.get()));
@@ -96,27 +95,18 @@ public class PracticedController {
         }
     }
 
-    @Operation(summary = "학습 정보 생성", description = "statement_id를 사용하여 학습 정보 생성합니다.", tags = { "Practiced Controller" })
-    @PostMapping("/practiced")
-    public ResponseEntity createPracticed(@ModelAttribute PracticedRequestDto dto){
-        Practiced practiced = practicedService.create(dto);
+    @Operation(summary = "학습 정보 생성", description = "statement_id를 사용하여 학습 정보 생성합니다.", tags = { "Practiced Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+            })
+    @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity createPracticed(@ModelAttribute PracticedRequestDto requestDto){
+        Practiced practiced = practicedService.create(requestDto);
         if(practiced!=null){
             return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
         }else{
-            return ResponseEntity.badRequest().build();
-        }
-
-    }
-
-    @Operation(summary = "학습 정보 업데이트", description = "학습 정보 업데이트(복습)", tags = { "Practiced Controller" })
-    @PatchMapping("/practiced")
-    public ResponseEntity updatedPracticed(@ModelAttribute PracticedRequestDto dto){
-        Practiced practiced = practicedService.update(dto);
-        if(practiced!=null){
-            return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
-        }else{
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.noContent().build();
         }
     }
-
 }
