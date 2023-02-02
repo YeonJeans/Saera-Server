@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.bookmark.Bookmark;
+import yeonjeans.saera.domain.practiced.Practiced;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,14 +21,11 @@ public class Statement {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private String record;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String pitchX;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String graphX;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String graphY;
+    private String pitchY;
 
     @OneToMany(mappedBy = "statement")
     private List<StatementTag> tags;
@@ -35,12 +33,14 @@ public class Statement {
     @OneToMany(mappedBy = "statement")
     private List<Bookmark> bookmarks;
 
+    @OneToMany(mappedBy = "statement")
+    private List<Practiced> practiceds;
+
     @Builder
-    public Statement(String content, String record, String graphX, String graphY) {
+    public Statement(String content, String pitchX, String pitchY) {
         this.content = content;
-        this.record = record;
-        this.graphX = graphX;
-        this.graphY = graphY;
+        this.pitchX = pitchX;
+        this.pitchY = pitchY;
     }
 
 }

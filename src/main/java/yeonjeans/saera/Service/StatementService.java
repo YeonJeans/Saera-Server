@@ -13,4 +13,5 @@ public interface StatementService {
     List<Statement> searchByContent(String content);
 
     List<Statement> getList();
+
 }

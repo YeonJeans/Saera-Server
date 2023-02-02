@@ -31,7 +31,6 @@ public class StatementServiceImpl implements StatementService {
         return tagRepository.findByName(tag);
     }
 
-
     @Override
     public List<Statement> getList() {
         return statementRepository.findAll();

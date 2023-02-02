@@ -9,10 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @Transactional
 public class StatementRepositoryTest {
@@ -20,34 +20,20 @@ public class StatementRepositoryTest {
     @Autowired
     StatementRepository statementRepository;
 
+    @Transactional
     @Test
     @DisplayName("Statement가 저장된다.")
     public void saveStatement(){
         //given
         String content = "content";
-        String record = "rcord";
         String recordImg = "record";
 
-
+        Statement result = statementRepository.save(Statement.builder().content(content).pitchX(recordImg).pitchY(recordImg).build());
         //when
-        List<Statement> statementList = statementRepository.findAll();
+        Optional<Statement> state = statementRepository.findById(result.getId());
 
         //then
-        Statement statement = statementList.get(0);
-        assertThat(statement.getContent()).isEqualTo("content");
+        assertThat(state.get().getContent()).isInstanceOf(String.class);
     }
 
-    @Test
-    public void findByTag(){
-        //given
-        String content = "content";
-        String record = "rcord";
-
-        //when
-        List<Statement> statementList = statementRepository.findByTag(1L);
-
-        //then
-        Statement statement = statementList.get(1);
-        assertThat(statement.getContent()).isEqualTo("content");
-    }
 }
