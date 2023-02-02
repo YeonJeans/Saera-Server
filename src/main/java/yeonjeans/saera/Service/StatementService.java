@@ -1,5 +1,6 @@
 package yeonjeans.saera.Service;
 
+import org.springframework.core.io.Resource;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.statement.Tag;
 
@@ -14,4 +15,5 @@ public interface StatementService {
 
     List<Statement> getList();
 
+    Resource getTTS(Long id);
 }
