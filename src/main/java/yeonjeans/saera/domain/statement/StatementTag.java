@@ -1,5 +1,6 @@
 package yeonjeans.saera.domain.statement;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,9 @@ public class StatementTag {
     @ManyToOne
     private Tag tag;
 
+    @Builder
+    public StatementTag(Statement statement, Tag tag) {
+        this.statement = statement;
+        this.tag = tag;
+    }
 }

@@ -60,6 +60,5 @@ public class StateListItemDto {
             this.date = null;
             this.practiced = null;
         }
-
     }
 }

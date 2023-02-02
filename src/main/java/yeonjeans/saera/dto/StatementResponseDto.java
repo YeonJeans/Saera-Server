@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public class StatementResponseDto {
     private Long id;
     private String content;
-    private String record;
     private String graphX;
     private String graphY;
 
@@ -20,9 +19,8 @@ public class StatementResponseDto {
     public StatementResponseDto(Statement state) {
         this.id = state.getId();
         this.content = state.getContent();
-        this.record = state.getRecord();
-        this.graphX = state.getGraphX();
-        this.graphY = state.getGraphY();
+        this.graphX = state.getPitchX();
+        this.graphY = state.getPitchY();
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());

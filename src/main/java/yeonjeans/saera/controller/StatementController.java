@@ -6,12 +6,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.StatementServiceImpl;
+import yeonjeans.saera.domain.practiced.Practiced;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.statement.StatementTag;
 import yeonjeans.saera.domain.statement.Tag;
@@ -42,6 +47,26 @@ public class StatementController {
             StatementResponseDto dto = new StatementResponseDto(s.get());
             return ResponseEntity.ok().body(dto);
         }else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
+    @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
+                    @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+            })
+    @GetMapping("/statements/record/{id}")
+    public ResponseEntity getExampleRecord(@PathVariable Long id){
+        Optional<Statement> s = statementService.searchById(id);
+        if(s.isPresent()){
+            Resource resource = new FileSystemResource("example.wav");
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("audio", "wav"));
+            //headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            return ResponseEntity.ok().headers(headers).body(resource);
+        }else{
             return ResponseEntity.noContent().build();
         }
     }
