@@ -74,7 +74,7 @@ public class PracticedServiceImpl {
         }
         Record record = recordRepository.save(Record.builder().path(saveName).build());
 
-        Practiced practiced = new Practiced(member.get(), statement.get(), record, "pitch_x", "pitch_y", 80);
+        Practiced practiced = new Practiced(member.get(), statement.get(), record, statement.get().getPitchX(), statement.get().getPitchY(), 80);
 
         return practicedRepository.save(practiced);
     }
