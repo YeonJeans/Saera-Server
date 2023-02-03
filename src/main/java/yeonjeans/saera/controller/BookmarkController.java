@@ -34,7 +34,7 @@ public class BookmarkController {
     @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
-                    @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             }
     )
     @GetMapping("/statements/bookmark")
@@ -53,7 +53,7 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = BookmarkResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = BookmarkResponseDto.class))),
             }
     )
     @PostMapping("/statements/{id}/bookmark")
@@ -72,14 +72,16 @@ public class BookmarkController {
         }
     }
 
-    @Operation(summary = "즐겨찾기 삭제", description = "bookmark_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
+    @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공"),
             }
     )
     @DeleteMapping("/statements/bookmark/{id}")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long id){
-        Optional<Bookmark> bookmark = bookmarkRepository.findById(id);
+        Optional<Statement> statement = statementRepository.findById(id);
+        Optional<Member> member = memberRepository.findById(1L);
+        Optional<Bookmark> bookmark = bookmarkRepository.findByStatementAndMember(statement.get(), member.get());
         if(bookmark.isPresent()){
             bookmarkRepository.delete(bookmark.get());
             return ResponseEntity.ok().build();
