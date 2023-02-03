@@ -36,7 +36,7 @@ public class StatementController {
 
     private final StatementServiceImpl statementService;
 
-    @Operation(summary = "문장 세부 조회", description = "id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
+    @Operation(summary = "문장 세부 조회", description = "statement_id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")

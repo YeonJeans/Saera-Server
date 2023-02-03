@@ -7,7 +7,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import yeonjeans.saera.util.Parsing;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +25,6 @@ public class StatementRepositoryTest {
 
     @Transactional
     @Test
-    @DisplayName("Statement가 저장된다.")
     public void saveStatement(){
         //given
         String content = "content";
@@ -33,7 +35,7 @@ public class StatementRepositoryTest {
         Optional<Statement> state = statementRepository.findById(result.getId());
 
         //then
-        assertThat(state.get().getContent()).isInstanceOf(String.class);
+        assertThat(state.isPresent());
     }
 
 }

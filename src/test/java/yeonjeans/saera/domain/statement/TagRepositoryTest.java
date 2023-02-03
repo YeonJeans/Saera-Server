@@ -20,8 +20,9 @@ public class TagRepositoryTest {
     @Autowired
     TagRepository tagRepository;
 
-    @Test
     @DisplayName("Tag 검색")
+    @Transactional
+    @Test
     public void findByName(){
         //given
         String name1 = "test1";
