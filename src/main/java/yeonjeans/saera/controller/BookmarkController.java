@@ -8,47 +8,29 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import yeonjeans.saera.domain.bookmark.Bookmark;
-import yeonjeans.saera.domain.bookmark.BookmarkRepository;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
-import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.statement.StatementRepository;
+import yeonjeans.saera.Service.BookmarkServiceImpl;
 import yeonjeans.saera.dto.BookmarkResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 
-import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
 public class BookmarkController {
 
-    private final BookmarkRepository bookmarkRepository;
-    private final MemberRepository memberRepository;
-    private final StatementRepository statementRepository;
+    private final BookmarkServiceImpl bookmarkService;
 
     @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
             }
     )
     @GetMapping("/statements/bookmark")
     public ResponseEntity<?> returnBookmarkList(){
-        Optional<Member> member = memberRepository.findById(1L);
-        if(member.isPresent()){
-            List<StateListItemDto> list = bookmarkRepository.findAllByMember(member.get())
-                    .stream()
-                    .map(StateListItemDto::new)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok().body(list);
-        }else {
-            return ResponseEntity.noContent().build();
-        }
+        List<StateListItemDto> list = bookmarkService.getList(1L);
+        return ResponseEntity.ok().body(list);
     }
 
     @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
@@ -58,36 +40,18 @@ public class BookmarkController {
     )
     @PostMapping("/statements/{id}/bookmark")
     public ResponseEntity<?> createBookmark(@PathVariable Long id){
-        Optional<Member> member = memberRepository.findById(1L);
-        Optional<Statement> state = statementRepository.findById(id);
-        if(member.isPresent()&&state.isPresent()){
-            Bookmark bookmark = bookmarkRepository.save(
-                    new Bookmark().builder()
-                            .statement(state.get())
-                            .member(member.get())
-                            .build());
-            return ResponseEntity.ok().body(new BookmarkResponseDto(bookmark));
-        }else {
-            return ResponseEntity.internalServerError().build();
-        }
+            return ResponseEntity.ok().body(bookmarkService.create(id));
     }
 
     @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
             }
     )
     @DeleteMapping("/statements/bookmark/{id}")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long id){
-        Optional<Statement> statement = statementRepository.findById(id);
-        Optional<Member> member = memberRepository.findById(1L);
-        Optional<Bookmark> bookmark = bookmarkRepository.findByStatementAndMember(statement.get(), member.get());
-        if(bookmark.isPresent()){
-            bookmarkRepository.delete(bookmark.get());
-            return ResponseEntity.ok().build();
-        }else{
-            return ResponseEntity.internalServerError().build();
-        }
-
+        bookmarkService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }
