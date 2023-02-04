@@ -41,21 +41,13 @@ public class PracticedController {
             responses = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
-            @ApiResponse(responseCode = "204", description = "존재하지 않는 리소스 접근")
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
         }
     )
     @GetMapping("/statements/practiced")
-    public ResponseEntity returnPracticedList(){
-        Optional<Member> member = memberRepository.findById(1L);
-        if(member.isPresent()){
-            List<StateListItemDto> list = practicedRepository.findAllByMember(member.get())
-                    .stream()
-                    .map(StateListItemDto::new)
-                    .collect(Collectors.toList());
+    public ResponseEntity<?> returnPracticedList(){
+            List<StateListItemDto> list = practicedService.getList(1L);
             return ResponseEntity.ok().body(list);
-        }else {
-            return ResponseEntity.noContent().build();
-        }
     }
 
     @Operation(summary = "유저 음성 파일 조회", description = "statement_id를 통해 유저의 음성 녹음 파일을 제공합니다.", tags = { "Practiced Controller" },
@@ -66,21 +58,12 @@ public class PracticedController {
     )
     @GetMapping("/record/{id}")
     public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id){
-        Optional<Statement> statement = statementRepository.findById(id);
-        Optional<Member> member = memberRepository.findById(1L);
-        Optional<Practiced> practiced = practicedRepository.findByStatementAndMember(statement.get(), member.get());
-        if(practiced.isPresent()){
-            String path = practiced.get().getRecord().getPath();
-
-            Resource resource1 = new FileSystemResource(path);
+            Resource resource = practicedService.getRecord(id, 1L);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(new MediaType("audio", "wav"));
-            //headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            return ResponseEntity.ok().headers(headers).body(resource1);
-        }else{
-            return ResponseEntity.noContent().build();
-        }
+            return ResponseEntity.ok().headers(headers).body(resource);
+
     }
 
     @Operation(summary = "학습정보만 조회", description = "statement_id를 통해 학습정보를 제공합니다..(학습진행후)", tags = { "Practiced Controller" },
@@ -90,15 +73,10 @@ public class PracticedController {
             }
     )
     @GetMapping("/practiced/{id}")
-    public ResponseEntity returnPracticed(@PathVariable(required = false) Long id){
-        Optional<Statement> statement = statementRepository.findById(id);
-        Optional<Member> member = memberRepository.findById(1L);
-        Optional<Practiced> practiced = practicedRepository.findByStatementAndMember(statement.get(), member.get());
-        if(practiced.isPresent()){
-            return ResponseEntity.ok().body(new PracticedResponseDto(practiced.get()));
-        }else{
-            return ResponseEntity.noContent().build();
-        }
+    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id){
+        PracticedResponseDto dto = practicedService.read(id, 1L);
+
+        return ResponseEntity.ok().body(dto);
     }
 
     @Operation(summary = "학습 정보 생성", description = "statement_id를 사용하여 학습 정보 생성합니다.", tags = { "Practiced Controller" },
@@ -107,7 +85,7 @@ public class PracticedController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity createPracticed(@ModelAttribute PracticedRequestDto requestDto){
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto){
         Practiced practiced = practicedService.create(requestDto);
         if(practiced!=null){
             return ResponseEntity.ok().body(new PracticedResponseDto(practiced));

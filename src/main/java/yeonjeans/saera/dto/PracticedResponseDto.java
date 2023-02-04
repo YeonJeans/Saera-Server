@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class PracticedResponseDto {
     String content;
     LocalDateTime date;
-    Integer accuracy;
+    Double score;
     private List<Integer> pitch_x;
     private List<Double> pitch_y;
 
@@ -23,7 +23,7 @@ public class PracticedResponseDto {
 
     public PracticedResponseDto(Practiced practiced) {
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
-        this.accuracy = practiced.getAccuracy();
+        this.score = practiced.getScore();
         this.pitch_x = Parsing.getIntegerList(practiced.getPitchX());
         this.pitch_y = Parsing.getDoubleList(practiced.getPitchY());
 

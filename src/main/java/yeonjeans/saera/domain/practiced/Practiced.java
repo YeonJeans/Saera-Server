@@ -34,7 +34,7 @@ public class Practiced extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String pitchY;
 
-    private Integer accuracy;
+    private Double score;
 
     @Builder
     public Practiced(Member member, Statement statement) {
@@ -43,12 +43,12 @@ public class Practiced extends BaseTimeEntity {
     }
 
     @Builder
-    public Practiced(Member member, Statement statement, Record record, String pitchX, String pitchY, Integer accuracy) {
+    public Practiced(Member member, Statement statement, Record record, String pitchX, String pitchY, Double score) {
         this.member = member;
         this.statement = statement;
         this.record = record;
         this.pitchX = pitchX;
         this.pitchY = pitchY;
-        this.accuracy = accuracy;
+        this.score = score;
     }
 }
