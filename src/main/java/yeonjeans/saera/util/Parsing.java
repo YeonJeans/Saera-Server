@@ -1,6 +1,7 @@
 package yeonjeans.saera.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Parsing {
@@ -10,16 +11,16 @@ public class Parsing {
         String sub = str.substring(1, str.length()-1);
         String[] array = sub.split(", ");
         for(String x : array){
-            list.add(Integer.valueOf(x));
+            list.add(Integer.valueOf(x.trim()));
         }
         return list;
     }
     public static List<Double> getDoubleList(String str){
         List<Double> list = new ArrayList<>();
         String sub = str.substring(1, str.length()-1);
-        String[] array = sub.split(", ");
+        String[] array = sub.split(",");
         for(String x : array){
-            list.add(Double.valueOf(x));
+            list.add(Double.valueOf(x.trim()));
         }
         return list;
     }
