@@ -55,4 +55,23 @@ public class StateListItemDto {
             this.practiced = false;
         }
     }
+
+    public StateListItemDto(Statement state){
+        this.content = state.getContent();
+        this.tags = state.getTags().stream()
+                .map(statementTag -> statementTag.getTag().getName())
+                .collect(Collectors.toList());
+        this.statement_id = state.getId();
+        this.bookmarked = state.getBookmarks().stream().anyMatch(i->i.getMember().getId().equals(1L));
+        try{
+            Practiced practiced = state.getPracticeds().stream()
+                    .filter(practice -> practice.getMember().getId().equals(1L))
+                    .findFirst().orElseThrow();
+            this.practiced = true;
+            this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
+        }catch (NoSuchElementException exception){
+            this.date = null;
+            this.practiced = false;
+        }
+    }
 }
