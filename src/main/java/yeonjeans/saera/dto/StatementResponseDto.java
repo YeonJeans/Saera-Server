@@ -5,7 +5,6 @@ import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.util.Parsing;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Data
@@ -21,8 +20,8 @@ public class StatementResponseDto<Bookmarked> {
     public StatementResponseDto(Statement state) {
         this.id = state.getId();
         this.content = state.getContent();
-        this.pitch_x = Parsing.getIntegerList(state.getPitchX());
-        this.pitch_y = Parsing.getDoubleList(state.getPitchY());
+        this.pitch_x = Parsing.stringToIntegerArray(state.getPitchX());
+        this.pitch_y = Parsing.stringToDoubleArray(state.getPitchY());
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());

@@ -2,10 +2,10 @@ package yeonjeans.saera.dto.webClient;
 
 import lombok.Getter;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Getter
 public class PitchGraphDto {
-    List<Integer> pitch_x;
-    List<Double> pitch_y;
+    ArrayList<Integer> pitch_x;
+    ArrayList<Double> pitch_y;
 }

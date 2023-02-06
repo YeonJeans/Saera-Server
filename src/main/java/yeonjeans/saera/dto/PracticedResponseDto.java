@@ -24,8 +24,8 @@ public class PracticedResponseDto {
     public PracticedResponseDto(Practiced practiced) {
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
         this.score = practiced.getScore();
-        this.pitch_x = Parsing.getIntegerList(practiced.getPitchX());
-        this.pitch_y = Parsing.getDoubleList(practiced.getPitchY());
+        this.pitch_x = Parsing.stringToIntegerArray(practiced.getPitchX());
+        this.pitch_y = Parsing.stringToDoubleArray(practiced.getPitchY());
 
         Statement state = practiced.getStatement();
         this.content = state.getContent();
