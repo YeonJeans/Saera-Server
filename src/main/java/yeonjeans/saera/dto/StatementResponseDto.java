@@ -16,6 +16,7 @@ public class StatementResponseDto<Bookmarked> {
 
     List<String> tags;
     private Boolean bookmarked;
+    private Boolean practiced;
 
     public StatementResponseDto(Statement state) {
         this.id = state.getId();
@@ -27,6 +28,7 @@ public class StatementResponseDto<Bookmarked> {
                 .collect(Collectors.toList());
 
         this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(1L));
+        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(1L));
     }
 
 }
