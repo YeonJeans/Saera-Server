@@ -87,10 +87,7 @@ public class PracticedController {
     @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto){
         Practiced practiced = practicedService.create(requestDto);
-        if(practiced!=null){
-            return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
-        }else{
-            return ResponseEntity.noContent().build();
-        }
+
+        return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
     }
 }

@@ -1,6 +1,7 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.domain.Record;
 import yeonjeans.saera.domain.RecordRepository;
@@ -21,19 +23,17 @@ import yeonjeans.saera.domain.statement.StatementRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
+import yeonjeans.saera.dto.webClient.PitchGraphDto;
+import yeonjeans.saera.dto.webClient.ScoreRequestDto;
 import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.util.Parsing;
 
 import static yeonjeans.saera.exception.ErrorCode.*;
+import static yeonjeans.saera.util.File.saveFile;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -45,8 +45,6 @@ public class PracticedServiceImpl {
     private final StatementRepository statementRepository;
     private final RecordRepository recordRepository;
     private final WebClient webClient;
-
-    private final String uploadPath = Paths.get(System.getProperty("user.home")).resolve("upload").toString();
 
     @Transactional
     public Practiced create(PracticedRequestDto dto){
@@ -60,14 +58,45 @@ public class PracticedServiceImpl {
             recordRepository.delete(oldPracticed.get().getRecord());
             new File(oldPath).deleteOnExit();
         }
+        String savePath = saveFile(dto.getRecord());
+        Resource resource = new FileSystemResource(savePath);
 
-        //record
-        String saveName = saveFile(dto.getRecord());
-        Record record = recordRepository.save(Record.builder().path(saveName).build());
+        try{
+            //get graph
+            PitchGraphDto graphDto = webClient.post()
+                    .uri("pitch-graph")
+                    .body(BodyInserters.fromMultipartData("audio", resource))
+                    .retrieve()
+                    .bodyToMono(PitchGraphDto.class)
+                    .block();
+            //get score
+            ScoreRequestDto requestDto = ScoreRequestDto.builder()
+                    .target_pitch_x(Parsing.stringToIntegerArray(statement.getPitchX()))
+                    .target_pitch_y(Parsing.stringToDoubleArray(statement.getPitchY()))
+                    .user_pitch_x(graphDto.getPitch_x())
+                    .user_pitch_y(graphDto.getPitch_y())
+                    .build();
 
-        Practiced practiced = new Practiced(member, statement, record, statement.getPitchX(), statement.getPitchY(), 80.0);
+            String response = webClient.post()
+                    .uri("score")
+                    .body(BodyInserters.fromValue(requestDto))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        return practicedRepository.save(practiced);
+            Double score = (Double) new JSONObject(response).getJSONObject("score").get("0");
+
+            //record
+            Record record = recordRepository.save(new Record(savePath));
+
+            Practiced practiced = new Practiced(member, statement, record, graphDto.getPitch_x().toString(), graphDto.getPitch_y().toString(), score);
+
+            return practicedRepository.save(practiced);
+
+        }catch (Exception e){
+            new File(savePath).deleteOnExit();
+            throw e;
+        }
     }
 
     public PracticedResponseDto read(Long statementId, Long memberId){
@@ -94,35 +123,4 @@ public class PracticedServiceImpl {
         String path = practiced.getRecord().getPath();
         return new FileSystemResource(path);
     }
-
-    public String makeFolder(){
-        String str = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-        String folderPath = str.replace("\\", File.separator);
-
-        File uploadPathFolder = new File(uploadPath, folderPath);
-
-        if(!uploadPathFolder.exists()){
-            uploadPathFolder.mkdirs();
-        }
-        return folderPath;
-    }
-
-    public String saveFile(MultipartFile file){
-        String originalName = file.getOriginalFilename();
-        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
-
-        String folderPath = makeFolder();
-        String uuid = UUID.randomUUID().toString();
-
-        String saveName = uploadPath + File.separator + folderPath + File.separator + uuid + "_" +fileName;
-        Path savePath = Paths.get(saveName);
-
-        try{
-            file.transferTo(savePath);
-        }catch (IOException e){
-            throw new CustomException(UPLOAD_FAILURE);
-        }
-        return saveName;
-    }
-
 }
