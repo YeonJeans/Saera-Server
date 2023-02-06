@@ -17,12 +17,12 @@ public class StateListItemDto {
     private LocalDateTime date;
 
     private Long statement_id;
-    private Long practiced;
-    private Long bookmarked;
+    private Boolean practiced;
+    private Boolean bookmarked;
 
 
     public StateListItemDto(Practiced practiced) {
-        this.practiced = practiced.getId();
+        this.practiced = true;
 
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
 
@@ -32,13 +32,7 @@ public class StateListItemDto {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
         this.statement_id = state.getId();
-        try{
-            this.bookmarked = state.getBookmarks().stream()
-                    .filter(bookmark -> bookmark.getMember().getId().equals(1L))
-                    .findFirst().orElseThrow().getId();
-        }catch (NoSuchElementException exception){
-            this.bookmarked = null;
-        }
+        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(1L));
     }
 
     public StateListItemDto(Bookmark bookmark) {
@@ -49,16 +43,16 @@ public class StateListItemDto {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
         this.statement_id = state.getId();
-        this.bookmarked = bookmark.getId();
+        this.bookmarked = true;
         try{
             Practiced practiced = state.getPracticeds().stream()
                     .filter(practice -> practice.getMember().getId().equals(1L))
                     .findFirst().orElseThrow();
-            this.practiced = practiced.getId();
+            this.practiced = true;
             this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
         }catch (NoSuchElementException exception){
             this.date = null;
-            this.practiced = null;
+            this.practiced = false;
         }
     }
 }

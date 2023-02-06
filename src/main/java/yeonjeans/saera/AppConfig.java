@@ -20,7 +20,7 @@ public class AppConfig {
 
     @Bean
     public StatementService StatementService() {
-        return new StatementServiceImpl(statementRepository, tagRepository);
+        return new StatementServiceImpl(statementRepository, tagRepository, webClient());
     }
 
     @Bean
