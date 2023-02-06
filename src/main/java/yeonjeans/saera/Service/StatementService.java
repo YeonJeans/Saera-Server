@@ -2,16 +2,15 @@ package yeonjeans.saera.Service;
 
 import org.springframework.core.io.Resource;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.statement.Tag;
+import yeonjeans.saera.dto.StateListItemDto;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public interface StatementService {
 
-    Optional<Statement> searchById(Long id);
-    Tag searchByTag(String tag);
-    List<Statement> searchByContent(String content);
+    Statement searchById(Long id);
+    List<StateListItemDto> search(String content, ArrayList<String> tags);
 
     List<Statement> getList();
 
