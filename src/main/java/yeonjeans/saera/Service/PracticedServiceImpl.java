@@ -51,7 +51,7 @@ public class PracticedServiceImpl {
         Member member = memberRepository.findById(1L).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement statement = statementRepository.findById(dto.getId()).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
-        Optional<Practiced> oldPracticed = practicedRepository.findById(dto.getId());
+        Optional<Practiced> oldPracticed = practicedRepository.findByStatementAndMember(statement, member);
         if(oldPracticed.isPresent()){
             String oldPath = oldPracticed.get().getRecord().getPath();
             practicedRepository.delete(oldPracticed.get());
