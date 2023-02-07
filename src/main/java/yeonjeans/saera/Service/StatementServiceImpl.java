@@ -3,7 +3,12 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import yeonjeans.saera.domain.Search;
+import yeonjeans.saera.domain.SearchRepository;
+import yeonjeans.saera.domain.member.Member;
+import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.*;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
@@ -14,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static yeonjeans.saera.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 
 @RequiredArgsConstructor
@@ -21,6 +27,8 @@ import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 public class StatementServiceImpl implements StatementService {
     private final StatementRepository statementRepository;
     private final TagRepository tagRepository;
+    private final MemberRepository memberRepository;
+    private final SearchRepository searchRepository;
     private final WebClient webClient;
 
     @Override
@@ -28,30 +36,37 @@ public class StatementServiceImpl implements StatementService {
         return statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
     }
 
-    public List<StateListItemDto> search(String content, ArrayList<String> tags){
+    @Override
+    public List<StateListItemDto> search(String content, ArrayList<String> tags, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+
+        Stream<Statement> statementStream;
         if(content==null&&tags==null){
-            return statementRepository.findAll()
-                    .stream().map(StateListItemDto::new).collect(Collectors.toList());
+            statementStream = statementRepository.findAll().stream();
         }else if(content!=null&&tags!=null){
-            return Stream.concat(statementRepository.findByContentContaining(content).stream(), searchByTagList(tags))
-                    .distinct()
-                    .map(StateListItemDto::new)
-                    .collect(Collectors.toList());
+            statementStream =Stream.concat(statementRepository.findByContentContaining(content).stream(), searchByTagList(tags))
+                    .distinct();
 
         }else if(content!=null){
-            return statementRepository.findByContentContaining(content).stream().map(StateListItemDto::new).collect(Collectors.toList());
+            statementStream = statementRepository.findByContentContaining(content).stream();
         }else{
-            return searchByTagList(tags).map(StateListItemDto::new).collect(Collectors.toList());
+            statementStream =  searchByTagList(tags);
         }
+        return statementStream.map(i->addSearchHistory(i,member)).collect(Collectors.toList());
 
     }
 
-    public Stream<Statement> searchByTagList(ArrayList<String> tags) {
-        return tags.stream().map(tagRepository::findByName)
-                .map(Tag::getStatements)
-            .flatMap(Collection::stream)
-            .map(StatementTag::getStatement)
-            .distinct();
+    @Transactional
+    StateListItemDto addSearchHistory(Statement statement, Member member){
+        searchRepository.save(new Search(member, statement));
+        return new StateListItemDto(statement);
+    }
+
+    @Override
+    public List<StateListItemDto> searchHistory(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+        List<Search> list = searchRepository.findTop3ByMemberOrderByCreatedDateDesc(member);
+        return list.stream().map(item->new StateListItemDto(item.getStatement())).collect(Collectors.toList());
     }
 
     @Override
@@ -65,5 +80,13 @@ public class StatementServiceImpl implements StatementService {
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();
+    }
+
+    public Stream<Statement> searchByTagList(ArrayList<String> tags) {
+        return tags.stream().map(tagRepository::findByName)
+                .map(Tag::getStatements)
+                .flatMap(Collection::stream)
+                .map(StatementTag::getStatement)
+                .distinct();
     }
 }

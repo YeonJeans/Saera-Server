@@ -10,7 +10,8 @@ import java.util.List;
 public interface StatementService {
 
     Statement searchById(Long id);
-    List<StateListItemDto> search(String content, ArrayList<String> tags);
+    List<StateListItemDto> search(String content, ArrayList<String> tags, Long memberId);
 
+    List<StateListItemDto> searchHistory(Long memberId);
     Resource getTTS(Long id);
 }
