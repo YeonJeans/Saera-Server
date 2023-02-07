@@ -105,7 +105,7 @@ public class PracticedServiceImpl {
 
     public List<StateListItemDto> getList(Long userId){
         Member member = memberRepository.findById(userId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        return practicedRepository.findAllByMember(member)
+        return practicedRepository.findAllByMemberOrderByCreatedDateDesc(member)
                 .stream()
                 .map(StateListItemDto::new)
                 .collect(Collectors.toList());

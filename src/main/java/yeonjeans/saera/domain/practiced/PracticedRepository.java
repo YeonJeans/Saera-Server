@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface PracticedRepository extends JpaRepository<Practiced, Long> {
     Optional<Practiced> findById(Long id);
     Optional<Practiced> findByStatementAndMember(Statement statement, Member member);
-    List<Practiced> findAllByMember(Member member);
+    List<Practiced> findAllByMemberOrderByCreatedDateDesc(Member member);
     Boolean existsByStatementAndMember(Statement statement, Member member);
 }
