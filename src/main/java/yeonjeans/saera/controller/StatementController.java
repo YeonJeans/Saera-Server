@@ -16,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.statement.StatementTag;
-import yeonjeans.saera.domain.statement.Tag;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
-import yeonjeans.saera.exception.CustomException;
 
 import java.util.ArrayList;
 import java.util.List;

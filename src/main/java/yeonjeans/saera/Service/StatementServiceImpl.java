@@ -55,11 +55,6 @@ public class StatementServiceImpl implements StatementService {
     }
 
     @Override
-    public List<Statement> getList() {
-        return statementRepository.findAll();
-    }
-
-    @Override
     public Resource getTTS(Long id) {
         Statement statement = statementRepository.findById(id)
                 .orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));

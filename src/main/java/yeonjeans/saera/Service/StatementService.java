@@ -12,7 +12,5 @@ public interface StatementService {
     Statement searchById(Long id);
     List<StateListItemDto> search(String content, ArrayList<String> tags);
 
-    List<Statement> getList();
-
     Resource getTTS(Long id);
 }
