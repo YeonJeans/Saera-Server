@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
-import yeonjeans.saera.domain.Record;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.member.Member;
 
