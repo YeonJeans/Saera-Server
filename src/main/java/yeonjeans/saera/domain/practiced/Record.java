@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain;
+package yeonjeans.saera.domain.practiced;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class Record {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String path;
 
     @Builder

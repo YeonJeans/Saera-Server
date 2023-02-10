@@ -47,7 +47,7 @@ public class WebClientTest {
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = (Double) new JSONObject(response).getJSONObject("score").get("0");
+        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
         System.out.println(score);
         Assertions.assertEquals(100.0, score);
     }
@@ -74,7 +74,7 @@ public class WebClientTest {
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = (Double) new JSONObject(response).getJSONObject("score").get("0");
+        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
         System.out.println(score);
         Assertions.assertEquals(100.0, score);
     }

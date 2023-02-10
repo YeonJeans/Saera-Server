@@ -4,16 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import yeonjeans.saera.domain.Record;
-import yeonjeans.saera.domain.RecordRepository;
+import yeonjeans.saera.domain.practiced.Record;
+import yeonjeans.saera.domain.practiced.RecordRepository;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.practiced.Practiced;
@@ -84,7 +80,7 @@ public class PracticedServiceImpl {
                     .bodyToMono(String.class)
                     .block();
 
-            Double score = (Double) new JSONObject(response).getJSONObject("score").get("0");
+            Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
 
             //record
             Record record = recordRepository.save(new Record(savePath));
@@ -109,7 +105,7 @@ public class PracticedServiceImpl {
 
     public List<StateListItemDto> getList(Long userId){
         Member member = memberRepository.findById(userId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        return practicedRepository.findAllByMember(member)
+        return practicedRepository.findAllByMemberOrderByCreatedDateDesc(member)
                 .stream()
                 .map(StateListItemDto::new)
                 .collect(Collectors.toList());

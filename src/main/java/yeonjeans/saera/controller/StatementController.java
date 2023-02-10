@@ -16,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.statement.StatementTag;
-import yeonjeans.saera.domain.statement.Tag;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
-import yeonjeans.saera.exception.CustomException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +65,19 @@ public class StatementController {
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags
     ){
-        List<StateListItemDto> list = statementService.search(content, tags);
+        List<StateListItemDto> list = statementService.search(content, tags, 1L);
 
         return ResponseEntity.ok().body(list);
     }
 
+    @Operation(summary = "최근 검색 내역 조회", description = "최근 검색한 문장 3개 제공", tags = { "Statement Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
+            }
+    )
+    @GetMapping("/search")
+    public ResponseEntity<?> searchHistory(){
+        List<StateListItemDto> list = statementService.searchHistory(1L);
+        return ResponseEntity.ok().body(list);
+    }
 }
