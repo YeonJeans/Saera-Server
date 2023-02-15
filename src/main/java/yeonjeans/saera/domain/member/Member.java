@@ -6,8 +6,9 @@ import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.BaseTimeEntity;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
-@NoArgsConstructor
 @Getter
 @Entity
 public class Member extends BaseTimeEntity {
@@ -23,6 +24,10 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private Platform platform;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<MemberRole> roleSet = new HashSet<>();
+
     @Column(nullable = false)
     private String nickname;
 
@@ -31,7 +36,7 @@ public class Member extends BaseTimeEntity {
     private int xp;
 
     @Builder
-    public Member(String email, Platform platform, String nickname, String profile) {
+    public Member(String email, Platform platform, String nickname, String profile, HashSet<MemberRole> roleSet) {
         this.email = email;
         this.platform = platform;
         this.nickname = nickname;
@@ -48,5 +53,9 @@ public class Member extends BaseTimeEntity {
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public void addMemberRole(MemberRole memberRole){
+        roleSet.add(memberRole);
     }
 }
