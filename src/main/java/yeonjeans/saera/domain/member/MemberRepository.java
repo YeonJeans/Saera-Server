@@ -14,6 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m where  m.email = :email and m.platform = :platform")
     Optional<Member> findByEmail(@Param("email") String email,@Param("platform") Platform platform);
 
+    Boolean existsByEmailAndPlatform(String email, Platform platform);
+
     @EntityGraph(attributePaths = {"roleSet"}, type = EntityGraph.EntityGraphType.LOAD)
     Optional<Member> findById(Long id);
 }

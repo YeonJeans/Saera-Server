@@ -27,4 +27,23 @@ public class MemberRepositoryTest {
 
         Assertions.assertEquals(member, result);
     }
+
+    @Transactional
+    @Test
+    public void existsByEmailAndPlatform(){
+        Member member = Member.builder()
+                .profile("test")
+                .platform(Platform.GOOGLE)
+                .email("test")
+                .nickname("testuser1")
+                .build();
+        member.addMemberRole(MemberRole.USER);
+        memberRepository.save(member);
+
+        Boolean result1 = memberRepository.existsByEmailAndPlatform("test", Platform.GOOGLE);
+        Boolean result2 = memberRepository.existsByEmailAndPlatform("tes", Platform.GOOGLE);
+
+        Assertions.assertEquals(true, result1);
+        Assertions.assertEquals(false, result2);
+    }
 }
