@@ -11,18 +11,15 @@ import java.util.Collection;
 import java.util.Map;
 
 @Getter
-public class AuthMemberDto extends User implements OAuth2User {
+public class AuthMemberDto extends User {
     private String email;
     private String name;
-    private Map<String, Object> attr;
+    private Long id;
 
-    public AuthMemberDto(String username, String password, Collection<? extends GrantedAuthority> authorities){
-        super(username, password, authorities);
-        this.email = username;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes(){
-        return this.attr;
+    public AuthMemberDto(String email, String password, Collection<? extends GrantedAuthority> authorities, Long id, String name){
+        super(email, password, authorities);
+        this.email = email;
+        this.name = name;
+        this.id = id;
     }
 }
