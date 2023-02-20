@@ -4,38 +4,47 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import yeonjeans.saera.Service.MemberServiceImpl;
+import yeonjeans.saera.Service.MemberService;
+import yeonjeans.saera.security.service.GoogleOAuth;
+import yeonjeans.saera.domain.member.Member;
+import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.member.Platform;
-import yeonjeans.saera.dto.LoginRequestDto;
-import yeonjeans.saera.dto.TokenResponseDto;
-import yeonjeans.saera.security.service.OAuthService;
+import yeonjeans.saera.dto.oauth.GoogleUser;
 
-import java.io.IOException;
+import yeonjeans.saera.dto.TokenResponseDto;
+import yeonjeans.saera.security.jwt.TokenProvider;
+import yeonjeans.saera.security.service.OAuthService;
 
 @Log4j2
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
 
-    private final MemberServiceImpl memberService;
     private final OAuthService oAuthService;
-
-    @PostMapping("/login")
-    public ResponseEntity<TokenResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
-        String token = memberService.createToken(loginRequest);
-        return ResponseEntity.ok().body(new TokenResponseDto(token, "bearer"));
-    }
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @GetMapping(value = "/auth/google/callback")
-    public String callback(
+    public ResponseEntity<?> callback(
             @RequestParam(name = "code") String code) {
-        log.info(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
-        return oAuthService.requestAccessToken(Platform.GOOGLE, code);
-    }
 
-    @GetMapping("/auth/{socialLoginType}")
-    public void socialLoginRedirect(@PathVariable String socialLoginType) throws IOException {
-        Platform platform = Platform.GOOGLE;
-        oAuthService.request(platform);
+        GoogleUser userInfo = oAuthService.getUserInfo(Platform.GOOGLE, code);
+
+        Member member;
+        TokenResponseDto dto;
+        Boolean isExist = memberRepository.existsByEmailAndPlatform(userInfo.getEmail(), Platform.GOOGLE);
+
+        //login
+        if(isExist){
+            member = memberRepository.findByEmail(userInfo.getEmail(), Platform.GOOGLE).get();
+            dto = memberService.login(member);
+        }
+        //join
+        else{
+            member = userInfo.toMember();
+            dto = memberService.join(member);
+        }
+
+        return ResponseEntity.ok().body(dto);
     }
 }

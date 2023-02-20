@@ -6,16 +6,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import yeonjeans.saera.security.service.CustomOAuth2UserDetailService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import yeonjeans.saera.security.jwt.JwtAuthenticationFilter;
+import yeonjeans.saera.security.jwt.TokenProvider;
 
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final CustomOAuth2UserDetailService customUserDetailService;
+    private final TokenProvider tokenProvider;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -33,13 +36,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests()
-                .antMatchers("/sample/all", "/login/oauth2/code/**").permitAll()
-                .antMatchers("/sample/user").hasRole("USER");
         http.formLogin();
         http.csrf().disable();
         http.oauth2Login();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

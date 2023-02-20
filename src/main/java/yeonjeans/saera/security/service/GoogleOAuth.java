@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain.member;
+package yeonjeans.saera.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,12 +26,12 @@ public class GoogleOAuth implements SocialOAuth {
     private String GOOGLE_CALLBACK_URI;
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String GOOGLE_CLIENT_SECRET;
-    private final String GOOGLE_TOKEN_BASE_URL = "https://oauth2.googleapis.com/token";
 
     private final WebClient webClient;
 
     RestTemplate restTemplate = new RestTemplate();
 
+    @Override
     public GoogleUser getUserInfo(String code) {
         ResponseEntity<String> response = requestAccessToken(code);
         GoogleOAuthToken googleOAuthToken = parseAccessToken(response);
@@ -39,7 +39,6 @@ public class GoogleOAuth implements SocialOAuth {
         return userInfo;
     }
 
-    @Override
     public ResponseEntity<String> requestAccessToken(String code) {
         Map<String, Object> params = new HashMap<>();
         params.put("code", code);
@@ -49,14 +48,14 @@ public class GoogleOAuth implements SocialOAuth {
         params.put("grant_type", "authorization_code");
         params.put("access_type", "offline");
 
+        String GOOGLE_TOKEN_BASE_URL = "https://oauth2.googleapis.com/token";
         ResponseEntity<String> responseEntity =
                 restTemplate.postForEntity(GOOGLE_TOKEN_BASE_URL, params, String.class);
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             return responseEntity;
         }
-        log.info(responseEntity.getBody());
-        return null; //구글 요청 실패
+        return null;// 구글 로그인 실패....? ^^?
     }
 
     public GoogleOAuthToken parseAccessToken(ResponseEntity<String> response){

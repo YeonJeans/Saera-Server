@@ -9,20 +9,22 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import yeonjeans.saera.dto.webClient.PitchGraphDto;
-import yeonjeans.saera.dto.webClient.ScoreRequestDto;
+import yeonjeans.saera.dto.ML.PitchGraphDto;
+import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.util.Parsing;
 
 @SpringBootTest
 public class WebClientTest {
     @Autowired
     WebClient webClient;
+    @Autowired
+    String MLserverBaseUrl;
 
     @Test
     public void getPitch(){
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
         PitchGraphDto dto = webClient.post()
-                .uri("pitch-graph")
+                .uri(MLserverBaseUrl+"pitch-graph")
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -41,7 +43,7 @@ public class WebClientTest {
 
         //when
         String response = webClient.post()
-                .uri("score")
+                .uri(MLserverBaseUrl+"score")
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -56,7 +58,7 @@ public class WebClientTest {
     public void getGraphAndScoreTest(){
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
         PitchGraphDto dto = webClient.post()
-                .uri("pitch-graph")
+                .uri(MLserverBaseUrl+"pitch-graph")
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
