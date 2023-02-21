@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import yeonjeans.saera.exception.CustomAuthenticationEntryPoint;
+import yeonjeans.saera.exception.ExceptionHandlerFilter;
 import yeonjeans.saera.security.jwt.JwtAuthenticationFilter;
 import yeonjeans.saera.security.jwt.TokenProvider;
 
@@ -19,6 +21,14 @@ import yeonjeans.saera.security.jwt.TokenProvider;
 @EnableWebSecurity
 public class SecurityConfig {
     private final TokenProvider tokenProvider;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(){
+        return new JwtAuthenticationFilter(tokenProvider);
+    }
+
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -36,11 +46,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.formLogin();
-        http.csrf().disable();
-        http.oauth2Login();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+        http
+                .formLogin()
+                .and()
+                .oauth2Login();
+        http
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
+        http
+                .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint);
 
         return http.build();
     }

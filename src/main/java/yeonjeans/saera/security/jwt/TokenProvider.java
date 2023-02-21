@@ -70,13 +70,13 @@ public class TokenProvider {
                 .setClaims(map)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + accessTokenExpiration))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime()+ refreshTokenExpiration))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
 
         return TokenResponseDto.builder()
@@ -86,43 +86,18 @@ public class TokenProvider {
                 .build();
     }
 
-//    public String getJwt(){
-//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-//        return request.getHeader("Authorization");
-//    }
-
     public String getMemberId(String accessToken){
-        if(!validateToken(accessToken)){
-            throw new JwtException("유효하지 않은 토큰");//..ㅎ
-        }
-
         Claims claims = parseClaims(accessToken);
         return claims.get("id", String.class);
     }
 
-    // 토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
-        try {
+    public boolean validateToken(String token) throws JwtException {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("Invalid JWT Token", e);
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT Token", e);
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT Token", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT claims string is empty.", e);
-        }
-        return false;
     }
 
-    private Claims parseClaims(String accessToken) {
-        try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+    private Claims parseClaims(String token) throws ExpiredJwtException {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
     public Authentication getAuthentication(String token) {
