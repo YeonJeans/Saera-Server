@@ -11,10 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.dto.StateListItemDto;
@@ -36,7 +33,7 @@ public class StatementController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @AuthenticationPrincipal AuthMember principal){
         Statement statement = statementService.searchById(id);
 
         return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId()));

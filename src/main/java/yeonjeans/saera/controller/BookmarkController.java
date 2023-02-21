@@ -29,7 +29,7 @@ public class BookmarkController {
                     @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
             }
     )
-    @GetMapping("/statements/bookmark")
+    @GetMapping("/bookmark")
     public ResponseEntity<?> returnBookmarkList(@AuthenticationPrincipal AuthMember principal){
 
         List<StateListItemDto> list = bookmarkService.getList(principal.getId());
@@ -41,7 +41,7 @@ public class BookmarkController {
                     @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = BookmarkResponseDto.class))),
             }
     )
-    @PostMapping("/statements/{id}/bookmark")
+    @PostMapping("/bookmark/{id}")
     public ResponseEntity<?> createBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal ){
             return ResponseEntity.ok().body(bookmarkService.create(id, principal.getId()));
     }
@@ -52,7 +52,7 @@ public class BookmarkController {
                     @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
             }
     )
-    @DeleteMapping("/statements/bookmark/{id}")
+    @DeleteMapping("/bookmark/{id}")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal){
         bookmarkService.delete(id, principal.getId());
         return ResponseEntity.ok().build();

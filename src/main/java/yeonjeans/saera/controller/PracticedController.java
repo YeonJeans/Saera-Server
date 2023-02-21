@@ -27,10 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 public class PracticedController {
-
-    private final PracticedRepository practicedRepository;
-    private final MemberRepository memberRepository;
-    private final StatementRepository statementRepository;
     private final PracticedServiceImpl practicedService;
 
     @Operation(summary = "학습한 문장 조회", description = "학습한 문장 리스트가 제공됩니다.", tags = { "Practiced Controller" },
@@ -40,7 +36,7 @@ public class PracticedController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
         }
     )
-    @GetMapping("/statements/practiced")
+    @GetMapping("/practiced")
     public ResponseEntity<?> returnPracticedList(@AuthenticationPrincipal AuthMember principal){
             List<StateListItemDto> list = practicedService.getList(principal.getId());
             return ResponseEntity.ok().body(list);
