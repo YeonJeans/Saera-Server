@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
 import yeonjeans.saera.dto.BookmarkResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.security.dto.AuthMember;
 
 import java.util.List;
 
@@ -28,8 +30,9 @@ public class BookmarkController {
             }
     )
     @GetMapping("/statements/bookmark")
-    public ResponseEntity<?> returnBookmarkList(){
-        List<StateListItemDto> list = bookmarkService.getList(1L);
+    public ResponseEntity<?> returnBookmarkList(@AuthenticationPrincipal AuthMember principal){
+
+        List<StateListItemDto> list = bookmarkService.getList(principal.getId());
         return ResponseEntity.ok().body(list);
     }
 
@@ -39,8 +42,8 @@ public class BookmarkController {
             }
     )
     @PostMapping("/statements/{id}/bookmark")
-    public ResponseEntity<?> createBookmark(@PathVariable Long id){
-            return ResponseEntity.ok().body(bookmarkService.create(id));
+    public ResponseEntity<?> createBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal ){
+            return ResponseEntity.ok().body(bookmarkService.create(id, principal.getId()));
     }
 
     @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
@@ -50,8 +53,8 @@ public class BookmarkController {
             }
     )
     @DeleteMapping("/statements/bookmark/{id}")
-    public ResponseEntity<?> deleteBookmark(@PathVariable Long id){
-        bookmarkService.delete(id);
+    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal){
+        bookmarkService.delete(id, principal.getId());
         return ResponseEntity.ok().build();
     }
 }

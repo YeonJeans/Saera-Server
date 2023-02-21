@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.security.dto.AuthMemberDto;
+import yeonjeans.saera.security.dto.AuthMember;
 
 import static yeonjeans.saera.exception.ErrorCode.*;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -26,15 +25,18 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        AuthMemberDto authMember = new AuthMemberDto(
+        Long memberId = Long.parseLong(username);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+        AuthMember authMember = new AuthMember(
                 member.getEmail(),
                 "",
                 member.getRoleSet().stream()
                         .map(role->new SimpleGrantedAuthority("ROLE_"+role.name()))
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                member.getId(),
+                member.getNickname()
         );
-        log.info(member);
         return authMember;
     }
 }

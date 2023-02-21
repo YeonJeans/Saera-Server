@@ -11,12 +11,12 @@ import java.util.Collection;
 import java.util.Map;
 
 @Getter
-public class AuthMemberDto extends User {
+public class AuthMember extends User {
     private String email;
     private String name;
     private Long id;
 
-    public AuthMemberDto(String email, String password, Collection<? extends GrantedAuthority> authorities, Long id, String name){
+    public AuthMember(String email, String password, Collection<? extends GrantedAuthority> authorities, Long id, String name){
         super(email, password, authorities);
         this.email = email;
         this.name = name;

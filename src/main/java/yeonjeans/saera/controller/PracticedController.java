@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.PracticedServiceImpl;
 import yeonjeans.saera.domain.member.MemberRepository;
@@ -19,6 +20,7 @@ import yeonjeans.saera.domain.statement.StatementRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
+import yeonjeans.saera.security.dto.AuthMember;
 
 import java.util.List;
 
@@ -39,8 +41,8 @@ public class PracticedController {
         }
     )
     @GetMapping("/statements/practiced")
-    public ResponseEntity<?> returnPracticedList(){
-            List<StateListItemDto> list = practicedService.getList(1L);
+    public ResponseEntity<?> returnPracticedList(@AuthenticationPrincipal AuthMember principal){
+            List<StateListItemDto> list = practicedService.getList(principal.getId());
             return ResponseEntity.ok().body(list);
     }
 
@@ -51,8 +53,8 @@ public class PracticedController {
             }
     )
     @GetMapping("/record/{id}")
-    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id){
-            Resource resource = practicedService.getRecord(id, 1L);
+    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id, @AuthenticationPrincipal AuthMember principal){
+            Resource resource = practicedService.getRecord(id, principal.getId());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(new MediaType("audio", "wav"));
@@ -67,8 +69,8 @@ public class PracticedController {
             }
     )
     @GetMapping("/practiced/{id}")
-    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id){
-        PracticedResponseDto dto = practicedService.read(id, 1L);
+    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id, @AuthenticationPrincipal AuthMember principal){
+        PracticedResponseDto dto = practicedService.read(id, principal.getId());
 
         return ResponseEntity.ok().body(dto);
     }
@@ -79,8 +81,8 @@ public class PracticedController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto){
-        Practiced practiced = practicedService.create(requestDto);
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @AuthenticationPrincipal AuthMember principal){
+        Practiced practiced = practicedService.create(requestDto, principal.getId());
 
         return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
     }

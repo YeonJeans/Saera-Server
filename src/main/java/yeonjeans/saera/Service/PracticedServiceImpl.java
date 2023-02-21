@@ -19,8 +19,8 @@ import yeonjeans.saera.domain.statement.StatementRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
-import yeonjeans.saera.dto.webClient.PitchGraphDto;
-import yeonjeans.saera.dto.webClient.ScoreRequestDto;
+import yeonjeans.saera.dto.ML.PitchGraphDto;
+import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.util.Parsing;
 
@@ -41,10 +41,11 @@ public class PracticedServiceImpl {
     private final StatementRepository statementRepository;
     private final RecordRepository recordRepository;
     private final WebClient webClient;
+    private final String MLserverBaseUrl;
 
     @Transactional
-    public Practiced create(PracticedRequestDto dto){
-        Member member = memberRepository.findById(1L).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+    public Practiced create(PracticedRequestDto dto, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement statement = statementRepository.findById(dto.getId()).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
         Optional<Practiced> oldPracticed = practicedRepository.findByStatementAndMember(statement, member);
@@ -60,7 +61,7 @@ public class PracticedServiceImpl {
         try{
             //get graph
             PitchGraphDto graphDto = webClient.post()
-                    .uri("pitch-graph")
+                    .uri(MLserverBaseUrl + "pitch-graph")
                     .body(BodyInserters.fromMultipartData("audio", resource))
                     .retrieve()
                     .bodyToMono(PitchGraphDto.class)
@@ -74,7 +75,7 @@ public class PracticedServiceImpl {
                     .build();
 
             String response = webClient.post()
-                    .uri("score")
+                    .uri(MLserverBaseUrl + "score")
                     .body(BodyInserters.fromValue(requestDto))
                     .retrieve()
                     .bodyToMono(String.class)
@@ -97,7 +98,7 @@ public class PracticedServiceImpl {
 
     public PracticedResponseDto read(Long statementId, Long memberId){
         Statement statement = statementRepository.findById(statementId).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
-        Member member = memberRepository.findById(1L).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         Practiced practiced = practicedRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
         return new PracticedResponseDto(practiced);

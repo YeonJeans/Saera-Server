@@ -34,8 +34,8 @@ public class BookmarkServiceImpl {
     }
 
     @Transactional
-    public BookmarkResponseDto create(Long id){
-        Member member = memberRepository.findById(1L).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+    public BookmarkResponseDto create(Long id, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement state = statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
         if(bookmarkRepository.existsByStatementAndMember(state, member)){
@@ -51,8 +51,8 @@ public class BookmarkServiceImpl {
     }
 
     @Transactional
-    public void delete(Long id){
-        Member member = memberRepository.findById(1L).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+    public void delete(Long id, Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement state = statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
         Bookmark bookmark = bookmarkRepository.findByStatementAndMember(state, member).orElseThrow(()->new CustomException(BOOKMARK_NOT_FOUND));

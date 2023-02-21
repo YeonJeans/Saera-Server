@@ -1,5 +1,6 @@
 package yeonjeans.saera.domain.member;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Member extends BaseTimeEntity {
 
@@ -34,14 +38,6 @@ public class Member extends BaseTimeEntity {
     private String profile;
 
     private int xp;
-
-    @Builder
-    public Member(String email, Platform platform, String nickname, String profile, HashSet<MemberRole> roleSet) {
-        this.email = email;
-        this.platform = platform;
-        this.nickname = nickname;
-        this.profile = profile;
-    }
 
     public void setNickname(String nickname) {
         this.nickname = nickname;

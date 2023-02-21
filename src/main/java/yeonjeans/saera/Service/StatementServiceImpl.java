@@ -30,6 +30,7 @@ public class StatementServiceImpl implements StatementService {
     private final MemberRepository memberRepository;
     private final SearchRepository searchRepository;
     private final WebClient webClient;
+    private final String MLserverBaseUrl;
 
     @Override
     public Statement searchById(Long id) {
@@ -76,7 +77,7 @@ public class StatementServiceImpl implements StatementService {
         String content = statement.getContent();
 
         return webClient.get()
-                .uri("/tts?text="+content)
+                .uri(MLserverBaseUrl + "/tts?text="+content)
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();

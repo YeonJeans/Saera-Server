@@ -1,11 +1,14 @@
 package yeonjeans.saera.dto;
 
-public class TokenResponseDto {
-    private String accessToken;
-    private String tokenType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
-    public TokenResponseDto(String accessToken, String tokenType) {
-        this.accessToken = accessToken;
-        this.tokenType = tokenType;
-    }
+@Builder
+@Data
+@AllArgsConstructor
+public class TokenResponseDto {
+    private String grantType;
+    private String accessToken;
+    private String refreshToken;
 }

@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.security.dto.AuthMember;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +36,10 @@ public class StatementController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id){
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal){
         Statement statement = statementService.searchById(id);
 
-        return ResponseEntity.ok().body(new StatementResponseDto(statement));
+        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId()));
     }
 
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
@@ -63,9 +65,10 @@ public class StatementController {
     @GetMapping("/statements")
     public ResponseEntity<?> searchStatement(
             @RequestParam(value = "content", required = false) String content,
-            @RequestParam(value = "tags", required= false) ArrayList<String> tags
+            @RequestParam(value = "tags", required= false) ArrayList<String> tags,
+            @AuthenticationPrincipal AuthMember principal
     ){
-        List<StateListItemDto> list = statementService.search(content, tags, 1L);
+        List<StateListItemDto> list = statementService.search(content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
     }
@@ -76,8 +79,8 @@ public class StatementController {
             }
     )
     @GetMapping("/search")
-    public ResponseEntity<?> searchHistory(){
-        List<StateListItemDto> list = statementService.searchHistory(1L);
+    public ResponseEntity<?> searchHistory(@AuthenticationPrincipal AuthMember principal){
+        List<StateListItemDto> list = statementService.searchHistory(principal.getId());
         return ResponseEntity.ok().body(list);
     }
 }

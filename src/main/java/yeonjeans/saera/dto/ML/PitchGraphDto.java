@@ -1,4 +1,4 @@
-package yeonjeans.saera.dto.webClient;
+package yeonjeans.saera.dto.ML;
 
 import lombok.Getter;
 
