@@ -108,7 +108,7 @@ public class PracticedServiceImpl {
         Member member = memberRepository.findById(userId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         return practicedRepository.findAllByMemberOrderByCreatedDateDesc(member)
                 .stream()
-                .map(StateListItemDto::new)
+                .map(practiced -> new StateListItemDto(practiced, member.getId()))
                 .collect(Collectors.toList());
     }
 

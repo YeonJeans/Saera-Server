@@ -9,7 +9,6 @@ import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.domain.statement.StatementRepository;
-import yeonjeans.saera.dto.BookmarkResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
 
@@ -29,12 +28,12 @@ public class BookmarkServiceImpl {
         Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         return bookmarkRepository.findAllByMember(member)
                 .stream()
-                .map(StateListItemDto::new)
+                .map(bookmark -> new StateListItemDto(bookmark, member.getId()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public BookmarkResponseDto create(Long id, Long memberId){
+    public boolean create(Long id, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement state = statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
@@ -47,7 +46,7 @@ public class BookmarkServiceImpl {
                         .member(member)
                         .build());
 
-        return new BookmarkResponseDto(bookmark);
+        return bookmark != null;
     }
 
     @Transactional

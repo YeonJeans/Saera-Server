@@ -36,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void saveRefreshToken(Member member, String refreshToken){
-        Optional<Login> result = loginRepository.findByMember_Id(member.getId());
+        Optional<Login> result = loginRepository.findByMemberId(member.getId());
         Login login;
         if(result.isPresent()){
             login = result.get();
