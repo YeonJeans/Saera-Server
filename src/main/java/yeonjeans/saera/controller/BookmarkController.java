@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
-import yeonjeans.saera.dto.BookmarkResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.security.dto.AuthMember;
@@ -38,12 +37,14 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공", content = @Content(schema = @Schema(implementation = BookmarkResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "성공"),
+                    @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음")
             }
     )
     @PostMapping("/bookmark/{id}")
     public ResponseEntity<?> createBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal ){
-            return ResponseEntity.ok().body(bookmarkService.create(id, principal.getId()));
+        bookmarkService.create(id, principal.getId());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
