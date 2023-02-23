@@ -48,7 +48,7 @@ public class PracticedController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             }
     )
-    @GetMapping("/record/{id}")
+    @GetMapping("/practiced/record/{id}")
     public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id, @AuthenticationPrincipal AuthMember principal){
             Resource resource = practicedService.getRecord(id, principal.getId());
 

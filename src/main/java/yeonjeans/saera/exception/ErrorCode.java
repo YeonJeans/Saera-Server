@@ -10,10 +10,12 @@ public enum ErrorCode {
 
     UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
     UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ""),
+    GOOGLE_AUTH_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "구글 서버에서 Token을 받아오는 데 실패했습니다."),
 
     /* 401 Unauthorized: 인증 실패*/
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰 형식입니다."),
+    REISSUE_FAILURE(HttpStatus.UNAUTHORIZED, "토큰 재발급에 실패했습니다."),
     BEARER_ERROR(HttpStatus.UNAUTHORIZED, "BEARER TOKEN 형식으로 요청해야 합니다."),
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, ""),
 

@@ -25,6 +25,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request,response);
         } catch (ExpiredJwtException e) {
+            log.info(e.toString());
             setErrorResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException e) {
             log.info(e.toString());

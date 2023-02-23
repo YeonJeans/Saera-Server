@@ -2,12 +2,15 @@ package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.json.JSONObject;
 import org.springframework.stereotype.Repository;
 import yeonjeans.saera.domain.Login;
 import yeonjeans.saera.domain.LoginRepository;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.dto.TokenResponseDto;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.jwt.TokenProvider;
 
 import java.util.Optional;
@@ -47,5 +50,26 @@ public class MemberServiceImpl implements MemberService {
                     Login.builder().RefreshToken(refreshToken).member(member).build()
             );
         }
+    }
+
+    public JSONObject reIssueToken(String refreshToken) throws CustomException {
+        Login stored = loginRepository.findByRefreshToken(refreshToken).orElseThrow(()->new CustomException(ErrorCode.REISSUE_FAILURE));
+
+        if(!refreshToken.equals(stored.getRefreshToken()))
+            throw new CustomException(ErrorCode.WRONG_TOKEN);
+
+        Long memberId = stored.getMember().getId();
+        String nickname = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND))
+                .getNickname();
+
+        TokenResponseDto dto = tokenProvider.generateToken(memberId, nickname);
+        stored.setRefreshToken(dto.getRefreshToken());
+        loginRepository.save(stored);
+        JSONObject reissued = new JSONObject();
+        reissued.put("grantType", dto.getGrantType());
+        reissued.put("accessToken", dto.getAccessToken());
+        reissued.put("refreshToken", dto.getRefreshToken());
+
+        return reissued;
     }
 }

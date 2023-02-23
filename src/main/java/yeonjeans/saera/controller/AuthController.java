@@ -5,14 +5,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.MemberService;
-import yeonjeans.saera.security.service.GoogleOAuth;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.member.Platform;
 import yeonjeans.saera.dto.oauth.GoogleUser;
 
 import yeonjeans.saera.dto.TokenResponseDto;
-import yeonjeans.saera.security.jwt.TokenProvider;
 import yeonjeans.saera.security.service.OAuthService;
 
 @Log4j2
@@ -44,7 +44,6 @@ public class AuthController {
             member = userInfo.toMember();
             dto = memberService.join(member);
         }
-
         return ResponseEntity.ok().body(dto);
     }
 }

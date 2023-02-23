@@ -4,27 +4,32 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import yeonjeans.saera.domain.Login;
+import yeonjeans.saera.domain.LoginRepository;
+import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.dto.TokenResponseDto;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.service.CustomUserDetailService;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class TokenProvider {
-    private final long accessTokenExpiration = 60 * 60 * 1000L; //1hour
+    private final long accessTokenExpiration = 60 * 60 * 24 * 1000L; //1hour
     private final long refreshTokenExpiration = 60 * 60 * 24 * 14 * 1000L; //2weeks
     private final Key key;
+
     private final CustomUserDetailService userDetailService;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey, CustomUserDetailService userDetailService) {
@@ -91,9 +96,10 @@ public class TokenProvider {
         return claims.get("id", String.class);
     }
 
-    public boolean validateToken(String token) throws JwtException {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
+    public boolean validateToken(String token) throws JwtException, IllegalArgumentException {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        return true;
     }
 
     private Claims parseClaims(String token) throws ExpiredJwtException {

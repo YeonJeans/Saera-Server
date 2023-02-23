@@ -10,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.dto.oauth.GoogleOAuthToken;
 import yeonjeans.saera.dto.oauth.GoogleUser;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,9 +35,14 @@ public class GoogleOAuth implements SocialOAuth {
 
     @Override
     public GoogleUser getUserInfo(String code) {
-        ResponseEntity<String> response = requestAccessToken(code);
-        GoogleOAuthToken googleOAuthToken = parseAccessToken(response);
-        GoogleUser userInfo = requestUserInfo(googleOAuthToken);
+        GoogleUser userInfo;
+        try{
+            ResponseEntity<String> response = requestAccessToken(code);
+            GoogleOAuthToken googleOAuthToken = parseAccessToken(response);
+            userInfo = requestUserInfo(googleOAuthToken);
+        } catch (Exception e){
+            throw new CustomException(ErrorCode.GOOGLE_AUTH_ERROR);
+        }
         return userInfo;
     }
 
