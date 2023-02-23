@@ -5,8 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.MemberService;
-import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.member.Platform;
