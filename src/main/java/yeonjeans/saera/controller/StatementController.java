@@ -17,6 +17,7 @@ import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ public class StatementController {
     @Operation(summary = "문장 세부 조회", description = "statement_id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/statements/{id}")
     public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
@@ -46,7 +48,7 @@ public class StatementController {
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             })
     @GetMapping("/statements/record/{id}")
     public ResponseEntity<?> getExampleRecord(@PathVariable Long id){
@@ -60,8 +62,9 @@ public class StatementController {
 
     @Operation(summary = "문장 검색", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
-                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
-            }
+                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+        }
     )
     @GetMapping("/statements")
     public ResponseEntity<?> searchStatement(
@@ -79,7 +82,9 @@ public class StatementController {
 
     @Operation(summary = "최근 검색 내역 조회", description = "최근 검색한 문장 3개 제공", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/search")

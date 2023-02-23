@@ -1,6 +1,7 @@
 package yeonjeans.saera.exception;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
