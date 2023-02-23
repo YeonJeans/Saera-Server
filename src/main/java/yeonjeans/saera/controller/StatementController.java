@@ -13,10 +13,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.Service.StatementService;
+import yeonjeans.saera.domain.member.Member;
+import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
@@ -28,6 +33,7 @@ import java.util.List;
 public class StatementController {
 
     private final StatementService statementService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "문장 세부 조회", description = "statement_id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
@@ -41,8 +47,8 @@ public class StatementController {
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         Statement statement = statementService.searchById(id);
-
-        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId()));
+        Member member = memberRepository.findById(principal.getId()).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId(), member.getNickname(), member.getProfile()));
     }
 
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
