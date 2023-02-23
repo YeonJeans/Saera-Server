@@ -4,7 +4,6 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class TokenProvider {
-    private final long accessTokenExpiration = 60 * 60 * 24 * 1000L; //1hour
+    private final long accessTokenExpiration = 60 * 60 * 1000L; //1hour
     private final long refreshTokenExpiration = 60 * 60 * 24 * 14 * 1000L; //2weeks
     private final Key key;
 

@@ -30,7 +30,6 @@ public class CreateDummy {
     @Autowired
     private StatementTagRepository statementTagRepo;
 
-    @Commit
     @Transactional
     @Test
     public void createDummy(){
