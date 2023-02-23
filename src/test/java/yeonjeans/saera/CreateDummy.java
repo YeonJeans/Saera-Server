@@ -48,7 +48,7 @@ public class CreateDummy {
         statementTagRepo.save(new StatementTag(statementList.get(3), tagList.get(2)));
         statementTagRepo.save(new StatementTag(statementList.get(4), tagList.get(0)));
         statementTagRepo.save(new StatementTag(statementList.get(4), tagList.get(2)));
-/*
+
         Member member1 = Member.builder().email("test1@gmail.com").nickname("testuser1").platform(Platform.GOOGLE).profile("testProfile").build();
         Member member2 = Member.builder().email("test2@gmail.com").nickname("testuser2").platform(Platform.GOOGLE).profile("testProfile").build();
         member1.addMemberRole(MemberRole.USER);
@@ -59,7 +59,6 @@ public class CreateDummy {
         bookmarkRepo.save(new Bookmark(member1,statementList.get(2)));
         bookmarkRepo.save(new Bookmark(member1,statementList.get(3)));
         bookmarkRepo.save(new Bookmark(member2,statementList.get(0)));
-    */
     }
 
     public Statement makeDummyState(String content){

@@ -11,12 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import yeonjeans.saera.domain.Login;
-import yeonjeans.saera.domain.LoginRepository;
-import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.dto.TokenResponseDto;
-import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.service.CustomUserDetailService;
 
 import java.security.Key;
@@ -45,7 +40,6 @@ public class TokenProvider {
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
-
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
@@ -97,7 +91,6 @@ public class TokenProvider {
     }
 
     public boolean validateToken(String token) throws JwtException, IllegalArgumentException {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         return true;
     }
