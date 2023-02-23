@@ -16,7 +16,7 @@ public class StateListItemDto {
     private List<String> tags;
     private LocalDateTime date;
 
-    private Long statement_id;
+    private Long id;
     private Boolean practiced;
     private Boolean bookmarked;
 
@@ -31,7 +31,7 @@ public class StateListItemDto {
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
+        this.id = state.getId();
         this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
     }
 
@@ -42,7 +42,7 @@ public class StateListItemDto {
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
+        this.id = state.getId();
         this.bookmarked = true;
         try{
             Practiced practiced = state.getPracticeds().stream()
@@ -61,7 +61,7 @@ public class StateListItemDto {
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
+        this.id = state.getId();
         this.bookmarked = state.getBookmarks().stream().anyMatch(i->i.getMember().getId().equals(memberId));
         try{
             Practiced practiced = state.getPracticeds().stream()
