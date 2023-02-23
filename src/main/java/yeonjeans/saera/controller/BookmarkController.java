@@ -7,7 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
 import yeonjeans.saera.dto.StateListItemDto;
@@ -29,7 +30,9 @@ public class BookmarkController {
             }
     )
     @GetMapping("/bookmark")
-    public ResponseEntity<?> returnBookmarkList(@AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<?> returnBookmarkList(@RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         List<StateListItemDto> list = bookmarkService.getList(principal.getId());
         return ResponseEntity.ok().body(list);
@@ -42,7 +45,10 @@ public class BookmarkController {
             }
     )
     @PostMapping("/bookmark/{id}")
-    public ResponseEntity<?> createBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal ){
+    public ResponseEntity<?> createBookmark(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         bookmarkService.create(id, principal.getId());
         return ResponseEntity.ok().build();
     }
@@ -54,7 +60,10 @@ public class BookmarkController {
             }
     )
     @DeleteMapping("/bookmark/{id}")
-    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         bookmarkService.delete(id, principal.getId());
         return ResponseEntity.ok().build();
     }

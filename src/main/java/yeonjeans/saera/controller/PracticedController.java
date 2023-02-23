@@ -10,13 +10,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.PracticedServiceImpl;
-import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.practiced.Practiced;
-import yeonjeans.saera.domain.practiced.PracticedRepository;
-import yeonjeans.saera.domain.statement.StatementRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
@@ -37,8 +35,11 @@ public class PracticedController {
         }
     )
     @GetMapping("/practiced")
-    public ResponseEntity<?> returnPracticedList(@AuthenticationPrincipal AuthMember principal){
-            List<StateListItemDto> list = practicedService.getList(principal.getId());
+    public ResponseEntity<?> returnPracticedList(@RequestHeader String authorization, @RequestHeader String RefreshToken) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        List<StateListItemDto> list = practicedService.getList(principal.getId());
             return ResponseEntity.ok().body(list);
     }
 
@@ -49,23 +50,29 @@ public class PracticedController {
             }
     )
     @GetMapping("/practiced/record/{id}")
-    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id, @AuthenticationPrincipal AuthMember principal){
-            Resource resource = practicedService.getRecord(id, principal.getId());
+    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(new MediaType("audio", "wav"));
-            return ResponseEntity.ok().headers(headers).body(resource);
+        Resource resource = practicedService.getRecord(id, principal.getId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("audio", "wav"));
+        return ResponseEntity.ok().headers(headers).body(resource);
 
     }
 
-    @Operation(summary = "학습정보만 조회", description = "statement_id를 통해 학습정보를 제공합니다..(학습진행후)", tags = { "Practiced Controller" },
+    @Operation(summary = "학습 정보 조회", description = "문장 id를 통해 학습정보를 제공합니다..", tags = { "Practiced Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             }
     )
     @GetMapping("/practiced/{id}")
-    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id, @AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         PracticedResponseDto dto = practicedService.read(id, principal.getId());
 
         return ResponseEntity.ok().body(dto);
@@ -77,7 +84,10 @@ public class PracticedController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         Practiced practiced = practicedService.create(requestDto, principal.getId());
 
         return ResponseEntity.ok().body(new PracticedResponseDto(practiced));

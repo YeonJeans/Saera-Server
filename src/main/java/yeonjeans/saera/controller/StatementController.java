@@ -10,7 +10,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.statement.Statement;
@@ -33,7 +34,10 @@ public class StatementController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         Statement statement = statementService.searchById(id);
 
         return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId()));
@@ -63,8 +67,11 @@ public class StatementController {
     public ResponseEntity<?> searchStatement(
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
-            @AuthenticationPrincipal AuthMember principal
+            @RequestHeader String authorization, @RequestHeader String RefreshToken
     ){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         List<StateListItemDto> list = statementService.search(content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
@@ -76,7 +83,10 @@ public class StatementController {
             }
     )
     @GetMapping("/search")
-    public ResponseEntity<?> searchHistory(@AuthenticationPrincipal AuthMember principal){
+    public ResponseEntity<?> searchHistory(@RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
         List<StateListItemDto> list = statementService.searchHistory(principal.getId());
         return ResponseEntity.ok().body(list);
     }
