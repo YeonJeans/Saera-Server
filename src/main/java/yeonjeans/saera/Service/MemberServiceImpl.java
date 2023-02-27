@@ -8,6 +8,7 @@ import yeonjeans.saera.domain.Login;
 import yeonjeans.saera.domain.LoginRepository;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
+import yeonjeans.saera.dto.MemberInfoResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
@@ -71,5 +72,16 @@ public class MemberServiceImpl implements MemberService {
         reissued.put("refreshToken", dto.getRefreshToken());
 
         return reissued;
+    }
+
+    public MemberInfoResponseDto getMemberInfo(Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberInfoResponseDto.builder()
+                .name(member.getNickname())
+                .email(member.getEmail())
+                .profileUrl(member.getProfile())
+                .xp(member.getXp())
+                .build();
     }
 }
