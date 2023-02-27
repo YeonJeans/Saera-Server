@@ -81,7 +81,7 @@ public class PracticedServiceImpl {
                     .bodyToMono(String.class)
                     .block();
 
-            Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
+            Double score = new JSONObject(response).getDouble("DTW_score");
 
             //record
             Record record = recordRepository.save(new Record(savePath));

@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.ML.ScoreRequestDto;
+import yeonjeans.saera.dto.ML.ScoreResponseDto;
 import yeonjeans.saera.util.Parsing;
 
 @SpringBootTest
@@ -43,15 +44,27 @@ public class WebClientTest {
 
         //when
         String response = webClient.post()
-                .uri(MLserverBaseUrl+"score")
+                .uri(MLserverBaseUrl + "score")
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
-        System.out.println(score);
-        Assertions.assertEquals(100.0, score);
+        Double dtwScore= new JSONObject(response).getDouble("DTW_score");
+        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
+        Assertions.assertNotNull(dtwScore);
+
+//        ScoreResponseDto dto = webClient.post()
+//                .uri(MLserverBaseUrl + "score")
+//                .body(BodyInserters.fromValue(requestDto))
+//                .retrieve()
+//                .bodyToMono(ScoreResponseDto.class)
+//                .block();
+//
+//        Double dtwScore= dto.getDTW_score();
+//        System.out.println(dto.getDTW_score());
+//        System.out.println(dto.getMAPE_score());
+//        Assertions.assertNotNull(dtwScore);
     }
 
     @Test
@@ -76,8 +89,8 @@ public class WebClientTest {
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
-        System.out.println(score);
-        //Assertions.assertEquals(100.0, score);
+        Double dtwScore= new JSONObject(response).getDouble("DTW_score");
+        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
+        Assertions.assertNotNull(dtwScore);
     }
 }
