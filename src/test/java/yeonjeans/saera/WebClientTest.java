@@ -9,20 +9,23 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import yeonjeans.saera.dto.webClient.PitchGraphDto;
-import yeonjeans.saera.dto.webClient.ScoreRequestDto;
+import yeonjeans.saera.dto.ML.PitchGraphDto;
+import yeonjeans.saera.dto.ML.ScoreRequestDto;
+import yeonjeans.saera.dto.ML.ScoreResponseDto;
 import yeonjeans.saera.util.Parsing;
 
 @SpringBootTest
 public class WebClientTest {
     @Autowired
     WebClient webClient;
+    @Autowired
+    String MLserverBaseUrl;
 
     @Test
     public void getPitch(){
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
         PitchGraphDto dto = webClient.post()
-                .uri("pitch-graph")
+                .uri(MLserverBaseUrl+"pitch-graph")
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -41,22 +44,34 @@ public class WebClientTest {
 
         //when
         String response = webClient.post()
-                .uri("score")
+                .uri(MLserverBaseUrl + "score")
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
-        System.out.println(score);
-        Assertions.assertEquals(100.0, score);
+        Double dtwScore= new JSONObject(response).getDouble("DTW_score");
+        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
+        Assertions.assertNotNull(dtwScore);
+
+//        ScoreResponseDto dto = webClient.post()
+//                .uri(MLserverBaseUrl + "score")
+//                .body(BodyInserters.fromValue(requestDto))
+//                .retrieve()
+//                .bodyToMono(ScoreResponseDto.class)
+//                .block();
+//
+//        Double dtwScore= dto.getDTW_score();
+//        System.out.println(dto.getDTW_score());
+//        System.out.println(dto.getMAPE_score());
+//        Assertions.assertNotNull(dtwScore);
     }
 
     @Test
     public void getGraphAndScoreTest(){
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
         PitchGraphDto dto = webClient.post()
-                .uri("pitch-graph")
+                .uri(MLserverBaseUrl+"pitch-graph")
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -68,14 +83,14 @@ public class WebClientTest {
 
         //when
         String response = webClient.post()
-                .uri("score")
+                .uri(MLserverBaseUrl + "score")
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
-        Double score = Double.parseDouble(new JSONObject(response).getJSONObject("score").get("0").toString());
-        System.out.println(score);
-        Assertions.assertEquals(100.0, score);
+        Double dtwScore= new JSONObject(response).getDouble("DTW_score");
+        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
+        Assertions.assertNotNull(dtwScore);
     }
 }

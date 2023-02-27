@@ -10,14 +10,20 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.Service.StatementService;
+import yeonjeans.saera.domain.member.Member;
+import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.Statement;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
+import yeonjeans.saera.exception.ErrorResponse;
+import yeonjeans.saera.security.dto.AuthMember;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,23 +33,28 @@ import java.util.List;
 public class StatementController {
 
     private final StatementService statementService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "문장 세부 조회", description = "statement_id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id){
-        Statement statement = statementService.searchById(id);
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        return ResponseEntity.ok().body(new StatementResponseDto(statement));
+        Statement statement = statementService.searchById(id);
+        Member member = memberRepository.findById(principal.getId()).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId(), member.getNickname(), member.getProfile()));
     }
 
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근")
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             })
     @GetMapping("/statements/record/{id}")
     public ResponseEntity<?> getExampleRecord(@PathVariable Long id){
@@ -57,27 +68,37 @@ public class StatementController {
 
     @Operation(summary = "문장 검색", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
-                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
-            }
+                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+        }
     )
     @GetMapping("/statements")
     public ResponseEntity<?> searchStatement(
             @RequestParam(value = "content", required = false) String content,
-            @RequestParam(value = "tags", required= false) ArrayList<String> tags
+            @RequestParam(value = "tags", required= false) ArrayList<String> tags,
+            @RequestHeader String authorization, @RequestHeader String RefreshToken
     ){
-        List<StateListItemDto> list = statementService.search(content, tags, 1L);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        List<StateListItemDto> list = statementService.search(content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
     }
 
     @Operation(summary = "최근 검색 내역 조회", description = "최근 검색한 문장 3개 제공", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))})
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/search")
-    public ResponseEntity<?> searchHistory(){
-        List<StateListItemDto> list = statementService.searchHistory(1L);
+    public ResponseEntity<?> searchHistory(@RequestHeader String authorization, @RequestHeader String RefreshToken){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        List<StateListItemDto> list = statementService.searchHistory(principal.getId());
         return ResponseEntity.ok().body(list);
     }
 }

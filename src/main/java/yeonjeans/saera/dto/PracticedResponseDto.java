@@ -19,7 +19,7 @@ public class PracticedResponseDto {
     private List<Integer> pitch_x;
     private List<Double> pitch_y;
 
-    Long statement_id;
+    Long id;
 
     public PracticedResponseDto(Practiced practiced) {
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
@@ -29,6 +29,6 @@ public class PracticedResponseDto {
 
         Statement state = practiced.getStatement();
         this.content = state.getContent();
-        this.statement_id = state.getId();
+        this.id = state.getId();
     }
 }

@@ -30,6 +30,7 @@ public class StatementServiceImpl implements StatementService {
     private final MemberRepository memberRepository;
     private final SearchRepository searchRepository;
     private final WebClient webClient;
+    private final String MLserverBaseUrl;
 
     @Override
     public Statement searchById(Long id) {
@@ -59,14 +60,14 @@ public class StatementServiceImpl implements StatementService {
     @Transactional
     StateListItemDto addSearchHistory(Statement statement, Member member){
         searchRepository.save(new Search(member, statement));
-        return new StateListItemDto(statement);
+        return new StateListItemDto(statement, member.getId());
     }
 
     @Override
     public List<StateListItemDto> searchHistory(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         List<Search> list = searchRepository.findTop3ByMemberOrderByCreatedDateDesc(member);
-        return list.stream().map(item->new StateListItemDto(item.getStatement())).collect(Collectors.toList());
+        return list.stream().map(item->new StateListItemDto(item.getStatement(), memberId)).collect(Collectors.toList());
     }
 
     @Override
@@ -76,7 +77,7 @@ public class StatementServiceImpl implements StatementService {
         String content = statement.getContent();
 
         return webClient.get()
-                .uri("/tts?text="+content)
+                .uri(MLserverBaseUrl + "/tts?text="+content)
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();

@@ -18,7 +18,10 @@ public class StatementResponseDto<Bookmarked> {
     private Boolean bookmarked;
     private Boolean practiced;
 
-    public StatementResponseDto(Statement state) {
+    private String nickname;
+    private String profileUrl;
+
+    public StatementResponseDto(Statement state, Long memberId, String nickname, String profileUrl) {
         this.id = state.getId();
         this.content = state.getContent();
         this.pitch_x = Parsing.stringToIntegerArray(state.getPitchX());
@@ -27,8 +30,11 @@ public class StatementResponseDto<Bookmarked> {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
 
-        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(1L));
-        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(1L));
+        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
+        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(memberId));
+
+        this.nickname = nickname;
+        this.profileUrl = profileUrl;
     }
 
 }

@@ -16,12 +16,12 @@ public class StateListItemDto {
     private List<String> tags;
     private LocalDateTime date;
 
-    private Long statement_id;
+    private Long id;
     private Boolean practiced;
     private Boolean bookmarked;
 
 
-    public StateListItemDto(Practiced practiced) {
+    public StateListItemDto(Practiced practiced, Long memberId) {
         this.practiced = true;
 
         this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
@@ -31,22 +31,22 @@ public class StateListItemDto {
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
-        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(1L));
+        this.id = state.getId();
+        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
     }
 
-    public StateListItemDto(Bookmark bookmark) {
+    public StateListItemDto(Bookmark bookmark, Long memberId) {
         Statement state = bookmark.getStatement();
 
         this.content = state.getContent();
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
+        this.id = state.getId();
         this.bookmarked = true;
         try{
             Practiced practiced = state.getPracticeds().stream()
-                    .filter(practice -> practice.getMember().getId().equals(1L))
+                    .filter(practice -> practice.getMember().getId().equals(memberId))
                     .findFirst().orElseThrow();
             this.practiced = true;
             this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
@@ -56,16 +56,16 @@ public class StateListItemDto {
         }
     }
 
-    public StateListItemDto(Statement state){
+    public StateListItemDto(Statement state, Long memberId){
         this.content = state.getContent();
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
-        this.statement_id = state.getId();
-        this.bookmarked = state.getBookmarks().stream().anyMatch(i->i.getMember().getId().equals(1L));
+        this.id = state.getId();
+        this.bookmarked = state.getBookmarks().stream().anyMatch(i->i.getMember().getId().equals(memberId));
         try{
             Practiced practiced = state.getPracticeds().stream()
-                    .filter(practice -> practice.getMember().getId().equals(1L))
+                    .filter(practice -> practice.getMember().getId().equals(memberId))
                     .findFirst().orElseThrow();
             this.practiced = true;
             this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
