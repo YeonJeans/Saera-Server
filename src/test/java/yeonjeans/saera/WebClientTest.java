@@ -11,8 +11,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.ML.ScoreRequestDto;
-import yeonjeans.saera.dto.ML.ScoreResponseDto;
 import yeonjeans.saera.util.Parsing;
+
+import java.io.IOException;
 
 @SpringBootTest
 public class WebClientTest {
@@ -22,8 +23,9 @@ public class WebClientTest {
     String MLserverBaseUrl;
 
     @Test
-    public void getPitch(){
+    public void getPitch() throws IOException {
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
+
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
                 .body(BodyInserters.fromMultipartData("audio", resource))
@@ -54,6 +56,7 @@ public class WebClientTest {
         Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
         Assertions.assertNotNull(dtwScore);
 
+//        dto로 바로 역직렬화 가능하게 test 중..
 //        ScoreResponseDto dto = webClient.post()
 //                .uri(MLserverBaseUrl + "score")
 //                .body(BodyInserters.fromValue(requestDto))
@@ -92,5 +95,18 @@ public class WebClientTest {
         Double dtwScore= new JSONObject(response).getDouble("DTW_score");
         Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
         Assertions.assertNotNull(dtwScore);
+    }
+
+    @Test
+    public void getTTS() throws IOException {
+        String content = "테스트 음성 어쩌구입니다.";
+
+        Resource resource = webClient.get()
+                .uri(MLserverBaseUrl + "/tts?text="+content)
+                .retrieve()
+                .bodyToMono(Resource.class)
+                .block();
+
+        Assertions.assertNotNull(resource);
     }
 }
