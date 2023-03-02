@@ -13,7 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import yeonjeans.saera.Service.MemberService;
+import yeonjeans.saera.Service.BookmarkServiceImpl;
+import yeonjeans.saera.Service.PracticedServiceImpl;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.domain.member.Member;
 import yeonjeans.saera.domain.member.MemberRepository;
@@ -34,6 +35,8 @@ public class StatementController {
 
     private final StatementService statementService;
     private final MemberRepository memberRepository;
+    private final PracticedServiceImpl practicedService;
+    private final BookmarkServiceImpl bookmarkService;
 
     @Operation(summary = "문장 세부 조회", description = "statement_id를 이용하여 statement 레코드를 단건 조회합니다.", tags = { "Statement Controller" },
             responses = {
@@ -57,7 +60,7 @@ public class StatementController {
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             })
     @GetMapping("/statements/record/{id}")
-    public ResponseEntity<?> getExampleRecord(@PathVariable Long id){
+    public ResponseEntity<?> returnExampleRecord(@PathVariable Long id){
         Resource resource = statementService.getTTS(id);
 
         HttpHeaders headers = new HttpHeaders();
@@ -66,14 +69,16 @@ public class StatementController {
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    @Operation(summary = "문장 검색", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
+    @Operation(summary = "문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
                 @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         }
     )
     @GetMapping("/statements")
-    public ResponseEntity<?> searchStatement(
+    public ResponseEntity<?> returnStatementList(
+            @RequestParam(value = "bookmarked", defaultValue = "false") boolean bookmarked,
+            @RequestParam(value = "practiced", defaultValue = "false") boolean practiced,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
             @RequestHeader String authorization, @RequestHeader String RefreshToken
@@ -81,7 +86,10 @@ public class StatementController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        List<StateListItemDto> list = statementService.search(content, tags, principal.getId());
+        List<StateListItemDto> list;
+        if(bookmarked) list = bookmarkService.getList(principal.getId());
+        else if(practiced) list = practicedService.getList(principal.getId());
+        else list = statementService.search(content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
     }
