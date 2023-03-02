@@ -3,12 +3,12 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import yeonjeans.saera.domain.bookmark.Bookmark;
-import yeonjeans.saera.domain.bookmark.BookmarkRepository;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
-import yeonjeans.saera.domain.statement.Statement;
-import yeonjeans.saera.domain.statement.StatementRepository;
+import yeonjeans.saera.domain.entity.Bookmark;
+import yeonjeans.saera.domain.repository.BookmarkRepository;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.MemberRepository;
+import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.repository.StatementRepository;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
 

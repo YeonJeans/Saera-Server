@@ -1,9 +1,9 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
-import yeonjeans.saera.domain.bookmark.Bookmark;
-import yeonjeans.saera.domain.practiced.Practiced;
-import yeonjeans.saera.domain.statement.Statement;
+import yeonjeans.saera.domain.entity.Bookmark;
+import yeonjeans.saera.domain.entity.Practiced;
+import yeonjeans.saera.domain.entity.Statement;
 
 import java.time.LocalDateTime;
 import java.util.List;

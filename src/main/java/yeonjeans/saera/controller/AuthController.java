@@ -15,19 +15,15 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.MemberService;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
-import yeonjeans.saera.domain.member.Platform;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.MemberRepository;
+import yeonjeans.saera.domain.entity.member.Platform;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
-import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.dto.oauth.GoogleUser;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 import yeonjeans.saera.security.service.OAuthService;
-
-
-import java.util.List;
 
 @Log4j2
 @RequiredArgsConstructor

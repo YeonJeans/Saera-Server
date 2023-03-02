@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.MemberRepository;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.security.dto.AuthMember;
 

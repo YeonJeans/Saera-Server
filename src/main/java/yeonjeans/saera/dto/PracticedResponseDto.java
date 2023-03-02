@@ -1,15 +1,12 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
-import yeonjeans.saera.domain.practiced.Practiced;
-import yeonjeans.saera.domain.statement.Statement;
+import yeonjeans.saera.domain.entity.Practiced;
+import yeonjeans.saera.domain.entity.Statement;
 import yeonjeans.saera.util.Parsing;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class PracticedResponseDto {
