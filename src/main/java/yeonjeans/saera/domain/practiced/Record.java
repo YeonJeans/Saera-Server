@@ -21,8 +21,16 @@ public class Record {
     @Column(nullable = false)
     private String path;
 
+    @Column(columnDefinition =  "LONGBLOB")
+    private byte[] wavFile;
+
     @Builder
     public Record(String path){
         this.path = path;
+    }
+
+    public Record(String path, byte[] wavFile) {
+        this.path = path;
+        this.wavFile = wavFile;
     }
 }
