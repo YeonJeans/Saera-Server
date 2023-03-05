@@ -7,15 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import yeonjeans.saera.dto.TokenResponseDto;
+import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.service.CustomUserDetailService;
 
 import java.security.Key;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,32 +32,6 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
-    public TokenResponseDto generateToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-        String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)
-                .setExpiration(new Date(now + accessTokenExpiration))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + refreshTokenExpiration))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        return TokenResponseDto.builder()
-                .grantType("Bearer")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
     public TokenResponseDto generateToken(Long memberId, String nickname) {
         Date now = new Date();
         Map<String , String> map = new HashMap<>();
@@ -72,6 +46,7 @@ public class TokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(String.valueOf(memberId))
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime()+ refreshTokenExpiration))
                 .signWith(key)
@@ -89,17 +64,58 @@ public class TokenProvider {
         return claims.get("id", String.class);
     }
 
-    public boolean validateToken(String token) throws JwtException, IllegalArgumentException {
-        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-        return true;
+    public String getSubject(String token){
+        Claims claims = parseClaims(token);
+        return claims.getSubject();
     }
 
-    private Claims parseClaims(String token) throws ExpiredJwtException {
+    private Claims parseClaims(String token) throws JwtException, IllegalArgumentException {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
+
+    public boolean validateToken(String token){
+        try{
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        }catch (ExpiredJwtException expiredJwtException){
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new CustomException(ErrorCode.WRONG_TOKEN);
+        }
+        return true;
     }
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = userDetailService.loadUserByUsername(this.getMemberId(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public String createAccessTokenForTest(Long memberId, String nickname) {
+        Date now = new Date();
+        Map<String , String> map = new HashMap<>();
+        map.put("id", String.valueOf(memberId));
+        map.put("name", nickname);
+
+        String accessToken = Jwts.builder()
+                .setClaims(map)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + 60*3*1000L))
+                .signWith(key)
+                .compact();
+
+        return accessToken;
+    }
+
+    public String createRefreshTokenForTest(Long memberId) {
+        Date now = new Date();
+
+        String refreshToken = Jwts.builder()
+                .setSubject(String.valueOf(memberId))
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime()+ 60*5*1000L))
+                .signWith(key)
+                .compact();
+
+        return refreshToken;
     }
 }
