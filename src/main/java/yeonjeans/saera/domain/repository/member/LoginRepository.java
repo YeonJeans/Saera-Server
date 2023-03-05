@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain.repository;
+package yeonjeans.saera.domain.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +11,8 @@ public interface LoginRepository extends JpaRepository<Login, Long> {
 
     public Optional<Login> findByMemberId(Long MemberId);
 
-    @Query("select l from Login l where l.RefreshToken = :token")
-    public Optional<Login> findByRefreshToken(@Param("token")String refreshToken);
+//    @Query("select l from Login l where l.RefreshToken = :token")
+//    public Optional<Login> findByRefreshToken(@Param("token")String refreshToken);
+
+    public Optional<Login> findByRefreshToken(String refreshToken);
 }

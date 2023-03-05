@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import yeonjeans.saera.domain.entity.Statement;
-import yeonjeans.saera.domain.repository.StatementRepository;
+import yeonjeans.saera.domain.entity.example.Statement;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
 
 import java.util.Optional;
 

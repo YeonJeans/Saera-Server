@@ -1,8 +1,8 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
-import yeonjeans.saera.domain.entity.Practiced;
-import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.util.Parsing;
 
 import java.time.LocalDateTime;
@@ -18,13 +18,13 @@ public class PracticedResponseDto {
 
     Long id;
 
-    public PracticedResponseDto(Practiced practiced) {
-        this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
-        this.score = practiced.getScore();
-        this.pitch_x = Parsing.stringToIntegerArray(practiced.getPitchX());
-        this.pitch_y = Parsing.stringToDoubleArray(practiced.getPitchY());
+    public PracticedResponseDto(Practice practice) {
+        this.date = practice.getModifiedDate()!=null? practice.getModifiedDate() : practice.getCreatedDate();
+        this.score = practice.getScore();
+        this.pitch_x = Parsing.stringToIntegerArray(practice.getPitchX());
+        this.pitch_y = Parsing.stringToDoubleArray(practice.getPitchY());
 
-        Statement state = practiced.getStatement();
+        Statement state = practice.getStatement();
         this.content = state.getContent();
         this.id = state.getId();
     }

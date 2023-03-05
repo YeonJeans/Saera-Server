@@ -1,7 +1,7 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
-import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.util.Parsing;
 
 import java.util.List;

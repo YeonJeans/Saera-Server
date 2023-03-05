@@ -8,14 +8,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import yeonjeans.saera.domain.entity.Record;
-import yeonjeans.saera.domain.repository.RecordRepository;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.member.Member;
-import yeonjeans.saera.domain.repository.MemberRepository;
-import yeonjeans.saera.domain.entity.Practiced;
-import yeonjeans.saera.domain.repository.PracticedRepository;
-import yeonjeans.saera.domain.entity.Statement;
-import yeonjeans.saera.domain.repository.StatementRepository;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.repository.PracticeRepository;
+import yeonjeans.saera.domain.entity.example.Statement;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
@@ -37,21 +36,21 @@ import java.util.stream.Collectors;
 public class PracticedServiceImpl {
 
     private final MemberRepository memberRepository;
-    private final PracticedRepository practicedRepository;
+    private final PracticeRepository practiceRepository;
     private final StatementRepository statementRepository;
     private final RecordRepository recordRepository;
     private final WebClient webClient;
     private final String MLserverBaseUrl;
 
     @Transactional
-    public Practiced create(PracticedRequestDto dto, Long memberId){
+    public Practice create(PracticedRequestDto dto, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement statement = statementRepository.findById(dto.getId()).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
-        Optional<Practiced> oldPracticed = practicedRepository.findByStatementAndMember(statement, member);
+        Optional<Practice> oldPracticed = practiceRepository.findByStatementAndMember(statement, member);
         if(oldPracticed.isPresent()){
             String oldPath = oldPracticed.get().getRecord().getPath();
-            practicedRepository.delete(oldPracticed.get());
+            practiceRepository.delete(oldPracticed.get());
             recordRepository.delete(oldPracticed.get().getRecord());
             new File(oldPath).deleteOnExit();
         }
@@ -86,9 +85,16 @@ public class PracticedServiceImpl {
             //record
             Record record = recordRepository.save(new Record(savePath));
 
-            Practiced practiced = new Practiced(member, statement, record, graphDto.getPitch_x().toString(), graphDto.getPitch_y().toString(), score);
+            Practice practice = Practice.builder()
+                    .file(null)
+                    .pitchX(graphDto.getPitch_x().toString())
+                    .pitchY(graphDto.getPitch_y().toString())
+                    .score(score)
+                    .type(ReferenceType.STATEMENT)
+                    .fk(dto.getId())
+                    .build();
 
-            return practicedRepository.save(practiced);
+            return practiceRepository.save(practice);
 
         }catch (Exception e){
             new File(savePath).deleteOnExit();
@@ -100,13 +106,13 @@ public class PracticedServiceImpl {
         Statement statement = statementRepository.findById(statementId).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
-        Practiced practiced = practicedRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
-        return new PracticedResponseDto(practiced);
+        Practice practice = practiceRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
+        return new PracticedResponseDto(practice);
     }
 
     public List<StateListItemDto> getList(Long userId){
         Member member = memberRepository.findById(userId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        return practicedRepository.findAllByMemberOrderByCreatedDateDesc(member)
+        return practiceRepository.findAllByMemberOrderByCreatedDateDesc(member)
                 .stream()
                 .map(practiced -> new StateListItemDto(practiced, member.getId()))
                 .collect(Collectors.toList());
@@ -115,9 +121,9 @@ public class PracticedServiceImpl {
     public Resource getRecord(Long statementId, Long memberId){
         Statement statement = statementRepository.findById(statementId).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        Practiced practiced = practicedRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
+        Practice practice = practiceRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
 
-        String path = practiced.getRecord().getPath();
+        String path = practice.getRecord().getPath();
         return new FileSystemResource(path);
     }
 }

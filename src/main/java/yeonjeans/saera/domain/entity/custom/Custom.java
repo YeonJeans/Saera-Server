@@ -1,16 +1,18 @@
-package yeonjeans.saera.domain.entity;
+package yeonjeans.saera.domain.entity.custom;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @Entity
-public class Statement {
+public class Custom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,20 +27,16 @@ public class Statement {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String pitchY;
 
-    @OneToMany(mappedBy = "statement")
-    private List<StatementTag> tags;
+    @OneToMany(mappedBy = "custom")
+    private List<CustomCtag> tags;
 
-    @OneToMany(mappedBy = "statement")
-    private List<Bookmark> bookmarks;
-
-    @OneToMany(mappedBy = "statement")
-    private List<Practiced> practiceds;
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     @Builder
-    public Statement(String content, String pitchX, String pitchY) {
+    public Custom(String content, String pitchX, String pitchY) {
         this.content = content;
         this.pitchX = pitchX;
         this.pitchY = pitchY;
     }
-
 }

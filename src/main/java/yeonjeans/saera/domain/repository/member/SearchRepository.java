@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain.repository;
+package yeonjeans.saera.domain.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import yeonjeans.saera.domain.entity.member.Search;

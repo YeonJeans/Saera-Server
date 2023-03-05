@@ -1,7 +1,7 @@
-package yeonjeans.saera.domain.repository;
+package yeonjeans.saera.domain.repository.example;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.entity.example.Statement;
 
 import java.util.List;
 

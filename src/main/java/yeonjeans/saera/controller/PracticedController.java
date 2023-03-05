@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.PracticedServiceImpl;
-import yeonjeans.saera.domain.entity.Practiced;
+import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.dto.PracticedRequestDto;
 import yeonjeans.saera.dto.PracticedResponseDto;
 import yeonjeans.saera.dto.StateListItemDto;
@@ -93,8 +93,8 @@ public class PracticedController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        Practiced practiced = practicedService.create(requestDto, principal.getId());
+        Practice practice = practicedService.create(requestDto, principal.getId());
 
-        return ResponseEntity.ok().body(new PracticedResponseDto(practiced));
+        return ResponseEntity.ok().body(new PracticedResponseDto(practice));
     }
 }

@@ -1,4 +1,4 @@
-package yeonjeans.saera.domain.entity;
+package yeonjeans.saera.domain.entity.example;
 
 import lombok.Builder;
 import lombok.Getter;

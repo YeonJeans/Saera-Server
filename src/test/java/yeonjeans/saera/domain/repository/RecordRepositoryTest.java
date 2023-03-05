@@ -8,8 +8,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.reactive.function.client.WebClient;
-import yeonjeans.saera.domain.entity.Record;
-import yeonjeans.saera.domain.repository.RecordRepository;
 
 import java.io.IOException;
 

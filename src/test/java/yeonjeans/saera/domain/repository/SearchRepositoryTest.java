@@ -7,11 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import yeonjeans.saera.domain.entity.member.Search;
 import yeonjeans.saera.domain.entity.member.Member;
-import yeonjeans.saera.domain.repository.MemberRepository;
 import yeonjeans.saera.domain.entity.member.Platform;
-import yeonjeans.saera.domain.repository.SearchRepository;
-import yeonjeans.saera.domain.entity.Statement;
-import yeonjeans.saera.domain.repository.StatementRepository;
+import yeonjeans.saera.domain.entity.example.Statement;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.domain.repository.member.SearchRepository;
 
 import java.util.List;
 

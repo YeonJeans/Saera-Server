@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import yeonjeans.saera.domain.entity.BaseTimeEntity;
-import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.entity.example.Statement;
 
 import javax.persistence.*;
 

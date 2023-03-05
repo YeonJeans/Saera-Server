@@ -3,14 +3,17 @@ package yeonjeans.saera.domain.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.member.Member;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
 @Entity
-public class Bookmark extends BaseTimeEntity {
+public class Bookmark{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,12 +22,17 @@ public class Bookmark extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Statement statement;
+    private ReferenceType type;
+
+    private Long fk;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
 
     @Builder
-    public Bookmark(Member member, Statement statement) {
+    public Bookmark(Member member, ReferenceType type, Long fk) {
         this.member = member;
-        this.statement = statement;
+        this.type = type;
+        this.fk = fk;
     }
 }

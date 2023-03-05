@@ -2,8 +2,8 @@ package yeonjeans.saera.dto;
 
 import lombok.Data;
 import yeonjeans.saera.domain.entity.Bookmark;
-import yeonjeans.saera.domain.entity.Practiced;
-import yeonjeans.saera.domain.entity.Statement;
+import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.Statement;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,12 +21,12 @@ public class StateListItemDto {
     private Boolean bookmarked;
 
 
-    public StateListItemDto(Practiced practiced, Long memberId) {
+    public StateListItemDto(Practice practice, Long memberId) {
         this.practiced = true;
 
-        this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
+        this.date = practice.getModifiedDate()!=null? practice.getModifiedDate() : practice.getCreatedDate();
 
-        Statement state = practiced.getStatement();
+        Statement state = practice.getStatement();
         this.content = state.getContent();
         this.tags = state.getTags().stream()
                 .map(statementTag -> statementTag.getTag().getName())
@@ -45,11 +45,11 @@ public class StateListItemDto {
         this.id = state.getId();
         this.bookmarked = true;
         try{
-            Practiced practiced = state.getPracticeds().stream()
+            Practice practice = state.getPracticeds().stream()
                     .filter(practice -> practice.getMember().getId().equals(memberId))
                     .findFirst().orElseThrow();
             this.practiced = true;
-            this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
+            this.date = practice.getModifiedDate()!=null? practice.getModifiedDate() : practice.getCreatedDate();
         }catch (NoSuchElementException exception){
             this.date = null;
             this.practiced = false;
@@ -64,11 +64,11 @@ public class StateListItemDto {
         this.id = state.getId();
         this.bookmarked = state.getBookmarks().stream().anyMatch(i->i.getMember().getId().equals(memberId));
         try{
-            Practiced practiced = state.getPracticeds().stream()
+            Practice practice = state.getPracticeds().stream()
                     .filter(practice -> practice.getMember().getId().equals(memberId))
                     .findFirst().orElseThrow();
             this.practiced = true;
-            this.date = practiced.getModifiedDate()!=null? practiced.getModifiedDate() : practiced.getCreatedDate();
+            this.date = practice.getModifiedDate()!=null? practice.getModifiedDate() : practice.getCreatedDate();
         }catch (NoSuchElementException exception){
             this.date = null;
             this.practiced = false;

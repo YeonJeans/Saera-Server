@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import yeonjeans.saera.domain.entity.Bookmark;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.repository.BookmarkRepository;
 import yeonjeans.saera.domain.entity.member.Member;
-import yeonjeans.saera.domain.repository.MemberRepository;
-import yeonjeans.saera.domain.entity.Statement;
-import yeonjeans.saera.domain.repository.StatementRepository;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.domain.entity.example.Statement;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
 
@@ -42,8 +43,8 @@ public class BookmarkServiceImpl {
         }
 
         Bookmark bookmark = bookmarkRepository.save(Bookmark.builder()
-                        .statement(state)
-                        .member(member)
+                        .type(ReferenceType.STATEMENT)
+                        .fk(memberId)
                         .build());
 
         return bookmark != null;

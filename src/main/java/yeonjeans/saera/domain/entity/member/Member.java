@@ -32,19 +32,24 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Set<MemberRole> roleSet = new HashSet<>();
 
+    @Column
+    private MemberStatus status;
+
     @Column(nullable = false)
-    private String nickname;
+    private String name;
 
-    private String profile;
+    @Column
+    private String profileUrl;
 
+    @Column
     private int xp;
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setNickname(String name) {
+        this.name = name;
     }
 
-    public void setProfile(String profile) {
-        this.profile = profile;
+    public void setProfile(String profileUrl) {
+        this.profileUrl = profileUrl;
     }
 
     public void setXp(int xp) {

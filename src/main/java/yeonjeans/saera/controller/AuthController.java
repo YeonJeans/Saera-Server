@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.domain.entity.member.Member;
-import yeonjeans.saera.domain.repository.MemberRepository;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.entity.member.Platform;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;

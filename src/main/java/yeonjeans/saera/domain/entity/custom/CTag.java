@@ -1,8 +1,8 @@
-package yeonjeans.saera.domain.entity;
+package yeonjeans.saera.domain.entity.custom;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import yeonjeans.saera.domain.entity.StatementTag;
+import yeonjeans.saera.domain.entity.member.Member;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,8 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Tag {
-
+public class CTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,10 +18,14 @@ public class Tag {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "tag")
-    private List<StatementTag> statements;
+    @ManyToOne
+    private Member member;
 
-    public Tag(String name) {
+    @OneToMany(mappedBy = "tag")
+    private List<CustomCtag> customs;
+
+    public CTag(String name, Member member) {
         this.name = name;
+        this.member = member;
     }
 }

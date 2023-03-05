@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import yeonjeans.saera.domain.entity.Tag;
-import yeonjeans.saera.domain.repository.TagRepository;
+import yeonjeans.saera.domain.entity.example.Tag;
+import yeonjeans.saera.domain.repository.example.TagRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
