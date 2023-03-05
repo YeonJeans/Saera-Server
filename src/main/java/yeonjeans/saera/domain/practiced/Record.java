@@ -3,10 +3,6 @@ package yeonjeans.saera.domain.practiced;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import yeonjeans.saera.domain.practiced.Practiced;
-import yeonjeans.saera.domain.statement.Statement;
 
 import javax.persistence.*;
 
@@ -21,7 +17,7 @@ public class Record {
     @Column(nullable = false)
     private String path;
 
-    @Column(columnDefinition =  "LONGBLOB")
+    @Column(columnDefinition = "MEDIUMBLOB")
     private byte[] wavFile;
 
     @Builder
