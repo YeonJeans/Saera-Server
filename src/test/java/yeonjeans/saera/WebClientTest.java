@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -21,6 +22,12 @@ public class WebClientTest {
     WebClient webClient;
     @Autowired
     String MLserverBaseUrl;
+    @Value("${ml.secret}")
+    private String ML_SECRET;
+    @Value("${clova.client-id}")
+    private String CLOVA_ID;
+    @Value("${clova.client-secret}")
+    private String CLOVA_SECRET;
 
     @Test
     public void getPitch() throws IOException {
@@ -28,6 +35,7 @@ public class WebClientTest {
 
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
+                .header("access-token",ML_SECRET)
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -47,6 +55,7 @@ public class WebClientTest {
         //when
         String response = webClient.post()
                 .uri(MLserverBaseUrl + "score")
+                .header("access-token",ML_SECRET)
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -75,6 +84,7 @@ public class WebClientTest {
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
+                .header("access-token", ML_SECRET)
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -87,6 +97,7 @@ public class WebClientTest {
         //when
         String response = webClient.post()
                 .uri(MLserverBaseUrl + "score")
+                .header("access-token",ML_SECRET)
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -98,11 +109,19 @@ public class WebClientTest {
     }
 
     @Test
-    public void getTTS() throws IOException {
+    public void getTTSfromClova() throws IOException {
         String content = "테스트 음성 어쩌구입니다.";
-
-        Resource resource = webClient.get()
-                .uri(MLserverBaseUrl + "/tts?text="+content)
+        Resource resource = webClient.post()
+                .uri("https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts")
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    headers.set("X-NCP-APIGW-API-KEY-ID", CLOVA_ID);
+                    headers.set("X-NCP-APIGW-API-KEY", CLOVA_SECRET);
+                })
+                .body(BodyInserters.fromFormData
+                                ("speaker", "nara")
+                                .with("text", content)
+                                .with("format", "wav"))
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();
