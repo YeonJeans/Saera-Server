@@ -1,10 +1,14 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import yeonjeans.saera.domain.Search;
 import yeonjeans.saera.domain.SearchRepository;
 import yeonjeans.saera.domain.member.Member;
@@ -12,6 +16,7 @@ import yeonjeans.saera.domain.member.MemberRepository;
 import yeonjeans.saera.domain.statement.*;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +36,12 @@ public class StatementServiceImpl implements StatementService {
     private final SearchRepository searchRepository;
     private final WebClient webClient;
     private final String MLserverBaseUrl;
+    @Value("${ml.secret}")
+    private String ML_SECRET;
+    @Value("${clova.client-id}")
+    private String CLOVA_ID;
+    @Value("${clova.client-secret}")
+    private String CLOVA_SECRET;
 
     @Override
     public Statement searchById(Long id) {
@@ -76,11 +87,21 @@ public class StatementServiceImpl implements StatementService {
                 .orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
         String content = statement.getContent();
 
-        return webClient.get()
-                .uri(MLserverBaseUrl + "/tts?text="+content)
+        return webClient.post()
+                .uri("https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts")
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    headers.set("X-NCP-APIGW-API-KEY-ID", CLOVA_ID);
+                    headers.set("X-NCP-APIGW-API-KEY", "2Y0KJ5v5U2eSajYUN7aiJwMXr5E8LuniKct7Vt1S");
+                })
+                .body(BodyInserters.fromFormData
+                                ("speaker", "vhyeri")
+                        .with("text", content)
+                        .with("format", "wav"))
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();
+
     }
 
     public Stream<Statement> searchByTagList(ArrayList<String> tags) {
