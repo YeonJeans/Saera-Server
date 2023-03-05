@@ -2,8 +2,10 @@ package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -22,6 +24,7 @@ import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.util.Parsing;
 
 import static yeonjeans.saera.exception.ErrorCode.*;
@@ -42,6 +45,8 @@ public class PracticedServiceImpl {
     private final RecordRepository recordRepository;
     private final WebClient webClient;
     private final String MLserverBaseUrl;
+    @Value("${ml.secret}")
+    private String ML_SECRET;
 
     @Transactional
     public Practiced create(PracticedRequestDto dto, Long memberId){
@@ -62,8 +67,14 @@ public class PracticedServiceImpl {
             //get graph
             PitchGraphDto graphDto = webClient.post()
                     .uri(MLserverBaseUrl + "pitch-graph")
+                    .header("access-token", ML_SECRET)
                     .body(BodyInserters.fromMultipartData("audio", resource))
                     .retrieve()
+                    .onStatus(HttpStatus::isError, response -> {
+                        if(response.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                            throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
+                        throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                    })
                     .bodyToMono(PitchGraphDto.class)
                     .block();
             //get score
@@ -76,8 +87,14 @@ public class PracticedServiceImpl {
 
             String response = webClient.post()
                     .uri(MLserverBaseUrl + "score")
+                    .header("access-token", ML_SECRET)
                     .body(BodyInserters.fromValue(requestDto))
                     .retrieve()
+                    .onStatus(HttpStatus::isError, res -> {
+                        if(res.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                            throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
+                        throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                    })
                     .bodyToMono(String.class)
                     .block();
 
