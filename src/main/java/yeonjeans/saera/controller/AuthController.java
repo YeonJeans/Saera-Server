@@ -51,7 +51,7 @@ public class AuthController {
 
         //login
         if(isExist){
-            member = memberRepository.findByEmail(userInfo.getEmail(), Platform.GOOGLE).get();
+            member = memberRepository.findByEmailAndPlatform(userInfo.getEmail(), Platform.GOOGLE).get();
             dto = memberService.login(member);
         }
         //join

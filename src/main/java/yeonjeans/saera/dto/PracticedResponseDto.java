@@ -24,8 +24,8 @@ public class PracticedResponseDto {
         this.pitch_x = Parsing.stringToIntegerArray(practice.getPitchX());
         this.pitch_y = Parsing.stringToDoubleArray(practice.getPitchY());
 
-        Statement state = practice.getStatement();
-        this.content = state.getContent();
-        this.id = state.getId();
+//        Statement state = practice.getStatement();
+//        this.content = state.getContent();
+//        this.id = state.getId();
     }
 }

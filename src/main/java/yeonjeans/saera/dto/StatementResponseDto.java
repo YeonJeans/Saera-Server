@@ -30,8 +30,8 @@ public class StatementResponseDto<Bookmarked> {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
 
-        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
-        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(memberId));
+//        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
+//        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(memberId));
 
         this.nickname = nickname;
         this.profileUrl = profileUrl;

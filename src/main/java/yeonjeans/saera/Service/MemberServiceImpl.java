@@ -26,7 +26,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public TokenResponseDto login(Member request) {
-        TokenResponseDto dto = tokenProvider.generateToken(request.getId(), request.getNickname());
+        TokenResponseDto dto = tokenProvider.generateToken(request.getId(), request.getName());
         saveRefreshToken(request, dto.getRefreshToken());
         return dto;
     }
@@ -34,7 +34,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public TokenResponseDto join(Member request) {
         Member member = memberRepository.save(request);
-        TokenResponseDto dto = tokenProvider.generateToken(member.getId(), member.getNickname());
+        TokenResponseDto dto = tokenProvider.generateToken(member.getId(), member.getName());
         saveRefreshToken(request, dto.getRefreshToken());
         return dto;
     }
@@ -48,7 +48,7 @@ public class MemberServiceImpl implements MemberService {
         }
         else{
             login = loginRepository.save(
-                    Login.builder().RefreshToken(refreshToken).member(member).build()
+                    Login.builder().refreshToken(refreshToken).member(member).build()
             );
         }
     }
@@ -61,7 +61,7 @@ public class MemberServiceImpl implements MemberService {
 
         Long memberId = stored.getMember().getId();
         String nickname = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND))
-                .getNickname();
+                .getName();
 
         TokenResponseDto dto = tokenProvider.generateToken(memberId, nickname);
         stored.setRefreshToken(dto.getRefreshToken());
@@ -78,9 +78,9 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         return MemberInfoResponseDto.builder()
-                .name(member.getNickname())
+                .name(member.getName())
                 .email(member.getEmail())
-                .profileUrl(member.getProfile())
+                .profileUrl(member.getProfileUrl())
                 .xp(member.getXp())
                 .build();
     }

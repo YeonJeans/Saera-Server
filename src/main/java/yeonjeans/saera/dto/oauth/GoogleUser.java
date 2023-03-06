@@ -23,10 +23,10 @@ public class GoogleUser {
 
     public Member toMember(){
         Member member = Member.builder()
-                .profile(picture)
+                .profileUrl(picture)
                 .platform(Platform.GOOGLE)
                 .email(email)
-                .nickname(name)
+                .name(name)
                 .build();
         member.addMemberRole(MemberRole.USER);
         return member;

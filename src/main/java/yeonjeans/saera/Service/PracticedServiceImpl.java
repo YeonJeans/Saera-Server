@@ -38,7 +38,6 @@ public class PracticedServiceImpl {
     private final MemberRepository memberRepository;
     private final PracticeRepository practiceRepository;
     private final StatementRepository statementRepository;
-    private final RecordRepository recordRepository;
     private final WebClient webClient;
     private final String MLserverBaseUrl;
 
@@ -47,12 +46,12 @@ public class PracticedServiceImpl {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement statement = statementRepository.findById(dto.getId()).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
-        Optional<Practice> oldPracticed = practiceRepository.findByStatementAndMember(statement, member);
+        Optional<Practice> oldPracticed = practiceRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, dto.getId());
         if(oldPracticed.isPresent()){
-            String oldPath = oldPracticed.get().getRecord().getPath();
-            practiceRepository.delete(oldPracticed.get());
-            recordRepository.delete(oldPracticed.get().getRecord());
-            new File(oldPath).deleteOnExit();
+//            String oldPath = oldPracticed.get().getRecord().getPath();
+//            practiceRepository.delete(oldPracticed.get());
+//            recordRepository.delete(oldPracticed.get().getRecord());
+//            new File(oldPath).deleteOnExit();
         }
         String savePath = saveFile(dto.getRecord());
         Resource resource = new FileSystemResource(savePath);
@@ -83,7 +82,7 @@ public class PracticedServiceImpl {
             Double score = new JSONObject(response).getDouble("DTW_score");
 
             //record
-            Record record = recordRepository.save(new Record(savePath));
+//            Record record = recordRepository.save(new Record(savePath));
 
             Practice practice = Practice.builder()
                     .file(null)
@@ -106,13 +105,13 @@ public class PracticedServiceImpl {
         Statement statement = statementRepository.findById(statementId).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
-        Practice practice = practiceRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
+        Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, statementId).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
         return new PracticedResponseDto(practice);
     }
 
     public List<StateListItemDto> getList(Long userId){
         Member member = memberRepository.findById(userId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        return practiceRepository.findAllByMemberOrderByCreatedDateDesc(member)
+        return practiceRepository.findAllByMemberAndTypeOrderByCreatedDateDesc(member, ReferenceType.STATEMENT)
                 .stream()
                 .map(practiced -> new StateListItemDto(practiced, member.getId()))
                 .collect(Collectors.toList());
@@ -121,9 +120,10 @@ public class PracticedServiceImpl {
     public Resource getRecord(Long statementId, Long memberId){
         Statement statement = statementRepository.findById(statementId).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        Practice practice = practiceRepository.findByStatementAndMember(statement, member).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
+        Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, statementId).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
 
-        String path = practice.getRecord().getPath();
-        return new FileSystemResource(path);
+//        String path = practice.getRecord().getPath();
+//        return new FileSystemResource(path);
+        return null;
     }
 }

@@ -19,12 +19,12 @@ public class Login extends BaseTimeEntity {
 
     @Id
     @Column
-    private String RefreshToken;
+    private String refreshToken;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
     public void setRefreshToken(String refreshToken) {
-        RefreshToken = refreshToken;
+        this.refreshToken = refreshToken;
     }
 }

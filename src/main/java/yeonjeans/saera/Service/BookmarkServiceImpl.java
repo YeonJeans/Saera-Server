@@ -27,7 +27,7 @@ public class BookmarkServiceImpl {
 
     public List<StateListItemDto> getList(Long id){
         Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        return bookmarkRepository.findAllByMember(member)
+        return bookmarkRepository.findAllByMemberAndAndType(member, ReferenceType.STATEMENT)
                 .stream()
                 .map(bookmark -> new StateListItemDto(bookmark, member.getId()))
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class BookmarkServiceImpl {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement state = statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
-        if(bookmarkRepository.existsByStatementAndMember(state, member)){
+        if(bookmarkRepository.existsByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, id)){
             throw new CustomException(ALREADY_BOOKMARKED);
         }
 
@@ -55,7 +55,7 @@ public class BookmarkServiceImpl {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
         Statement state = statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
-        Bookmark bookmark = bookmarkRepository.findByStatementAndMember(state, member).orElseThrow(()->new CustomException(BOOKMARK_NOT_FOUND));
+        Bookmark bookmark = bookmarkRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, id).orElseThrow(()->new CustomException(BOOKMARK_NOT_FOUND));
         bookmarkRepository.delete(bookmark);
     }
 }

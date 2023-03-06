@@ -25,11 +25,9 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
 
-    private final MemberService memberService;
-
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(){
-        return new JwtAuthenticationFilter(tokenProvider, memberService);
+        return new JwtAuthenticationFilter(tokenProvider);
     }
 
     @Bean

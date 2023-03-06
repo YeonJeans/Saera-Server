@@ -20,7 +20,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
-    private final MemberService memberService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -32,14 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 tokenProvider.validateToken(accessToken);
             } catch (ExpiredJwtException e) {
                 logger.info(e);
-                tokenProvider.validateToken(refreshToken);
-                JSONObject reissued = memberService.reIssueToken(refreshToken);
-
-                response.setStatus(499);
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().print(reissued);
-                return;
+//                tokenProvider.validateToken(refreshToken);
+//                JSONObject reissued = memberService.reIssueToken(refreshToken);
+//
+//                response.setStatus(499);
+//                response.setContentType("application/json");
+//                response.setCharacterEncoding("UTF-8");
+//                response.getWriter().print(reissued);
+//                return;
             }
 
             Authentication authentication = tokenProvider.getAuthentication(accessToken);

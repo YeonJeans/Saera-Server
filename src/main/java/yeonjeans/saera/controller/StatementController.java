@@ -51,7 +51,7 @@ public class StatementController {
 
         Statement statement = statementService.searchById(id);
         Member member = memberRepository.findById(principal.getId()).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId(), member.getNickname(), member.getProfile()));
+        return ResponseEntity.ok().body(new StatementResponseDto(statement, principal.getId(), member.getName(), member.getProfileUrl()));
     }
 
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
