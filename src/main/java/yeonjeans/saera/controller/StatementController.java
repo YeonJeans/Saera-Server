@@ -42,10 +42,11 @@ public class StatementController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -56,8 +57,9 @@ public class StatementController {
 
     @Operation(summary = "예시 음성 조회", description = "statement id를 이용하여 예시 음성을 조회 합니다.", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatementResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/statements/record/{id}")
     public ResponseEntity<?> returnExampleRecord(@PathVariable Long id){
@@ -71,8 +73,9 @@ public class StatementController {
 
     @Operation(summary = "문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
-                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         }
     )
     @GetMapping("/statements")
@@ -81,7 +84,7 @@ public class StatementController {
             @RequestParam(value = "practiced", defaultValue = "false") boolean practiced,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
-            @RequestHeader String authorization, @RequestHeader String RefreshToken
+            @RequestHeader String authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
@@ -96,13 +99,14 @@ public class StatementController {
 
     @Operation(summary = "최근 검색 내역 조회", description = "최근 검색한 문장 3개 제공", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/search")
-    public ResponseEntity<?> searchHistory(@RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> searchHistory(@RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 

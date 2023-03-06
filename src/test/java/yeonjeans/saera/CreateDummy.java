@@ -2,6 +2,7 @@ package yeonjeans.saera;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -46,6 +47,12 @@ public class CreateDummy {
     private WebClient webClient;
     @Autowired
     private String MLserverBaseUrl;
+    @Value("${ml.secret}")
+    private String ML_SECRET;
+    @Value("${clova.client-id}")
+    private String CLOVA_ID;
+    @Value("${clova.client-secret}")
+    private String CLOVA_SECRET;
 
     @Transactional
     @Test
@@ -79,25 +86,18 @@ public class CreateDummy {
 
     @Test
     public Statement makeStatement(String content) {
-        Resource resource = webClient.get()
-                .uri(MLserverBaseUrl + "/tts?text="+content)
+        Resource resource = webClient.post()
+                .uri("https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts")
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    headers.set("X-NCP-APIGW-API-KEY-ID", CLOVA_ID);
+                    headers.set("X-NCP-APIGW-API-KEY", CLOVA_SECRET);
+                })
+                .body(BodyInserters.fromFormData
+                                ("speaker", "nara")
+                        .with("text", content)
+                        .with("format", "wav"))
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError, response -> {
-                    System.err.println("Client error: "+ response.statusCode());
-                    return response.bodyToMono(String.class)
-                            .flatMap(body -> {
-                                System.err.println("Response body: " + body);
-                                return Mono.error(new RuntimeException("Client error"));
-                            });
-                })
-                .onStatus(HttpStatus::is5xxServerError, response -> {
-                    System.err.println("Server error: "+ response.statusCode());
-                    return response.bodyToMono(String.class)
-                            .flatMap(body -> {
-                                System.err.println("Response body: "+ body);
-                                return Mono.error(new RuntimeException("Server error"));
-                            });
-                })
                 .bodyToMono(Resource.class)
                 .block();
 
@@ -117,6 +117,7 @@ public class CreateDummy {
 
         PitchGraphDto graphDto = webClient.post()
                 .uri(MLserverBaseUrl + "pitch-graph")
+                .header("access-token",ML_SECRET)
                 .body(BodyInserters.fromMultipartData("audio", audioResource))
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, response -> {

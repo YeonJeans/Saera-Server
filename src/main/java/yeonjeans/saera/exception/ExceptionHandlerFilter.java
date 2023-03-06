@@ -36,7 +36,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         JSONObject responseJson = new JSONObject();
-        responseJson.put("status", errorCode.getHttpStatus().value());
+        if(errorCode == ErrorCode.EXPIRED_TOKEN) responseJson.put("status", 499);
+        else responseJson.put("status", errorCode.getHttpStatus().value());
         responseJson.put("error", errorCode.getHttpStatus().name());
         responseJson.put("code", errorCode.name());
         responseJson.put("message", errorCode.getDetail());

@@ -12,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
 import yeonjeans.saera.dto.StateListItemDto;
-import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
@@ -26,13 +25,14 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StatementResponseDto.class)))}),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/bookmark")
-    public ResponseEntity<?> returnBookmarkList(@RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> returnBookmarkList(@RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -42,13 +42,14 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공"),
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @PostMapping("/bookmark/{id}")
-    public ResponseEntity<?> createBookmark(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> createBookmark(@PathVariable Long id, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -58,13 +59,14 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "삭제 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             }
     )
     @DeleteMapping("/bookmark/{id}")
-    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 

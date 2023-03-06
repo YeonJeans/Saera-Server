@@ -49,8 +49,8 @@ public class SecurityConfig {
 //        http
 //                .exceptionHandling()
 //                .authenticationEntryPoint(customAuthenticationEntryPoint);
-        http.formLogin();
-        http.oauth2Login();
+ //       http.formLogin();
+  //     http.oauth2Login();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -59,8 +59,8 @@ public class SecurityConfig {
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
         http.authorizeRequests()
-                .antMatchers("/bookmark**", "/bookmark/**", "/statements**", "/statements/**", "/practiced**", "/practiced/**", "/search").authenticated()
-                .anyRequest().permitAll();
+                .antMatchers("/test/**", "/reissue-token", "/auth/**").permitAll()
+                .anyRequest().authenticated();
 
         return http.build();
     }

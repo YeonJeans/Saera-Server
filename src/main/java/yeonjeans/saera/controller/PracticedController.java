@@ -33,11 +33,12 @@ public class PracticedController {
             @ApiResponse(responseCode = "200", description = "조회 성공",
                     content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-        }
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    }
     )
     @GetMapping("/practiced")
-    public ResponseEntity<?> returnPracticedList(@RequestHeader String authorization, @RequestHeader String RefreshToken) {
+    public ResponseEntity<?> returnPracticedList(@RequestHeader String authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -47,13 +48,14 @@ public class PracticedController {
 
     @Operation(summary = "유저 음성 파일 조회", description = "statement_id를 통해 유저의 음성 녹음 파일을 제공합니다.", tags = { "Practiced Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/practiced/record/{id}")
-    public ResponseEntity returnPracticedRecord(@PathVariable(required = false) Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity returnPracticedRecord(@PathVariable Long id, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -69,11 +71,12 @@ public class PracticedController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
     @GetMapping("/practiced/{id}")
-    public ResponseEntity<?> returnPracticed(@PathVariable(required = false) Long id, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> returnPracticed(@PathVariable Long id, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -82,14 +85,15 @@ public class PracticedController {
         return ResponseEntity.ok().body(dto);
     }
 
-    @Operation(summary = "학습 정보 생성", description = "statement_id를 사용하여 학습 정보 생성합니다.", tags = { "Practiced Controller" },
+    @Operation(summary = "학습 정보 생성", description = "문장 id를 사용하여 학습 정보를 생성합니다.", tags = { "Practiced Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String authorization, @RequestHeader String RefreshToken){
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
