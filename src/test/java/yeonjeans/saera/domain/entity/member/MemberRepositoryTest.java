@@ -16,15 +16,15 @@ public class MemberRepositoryTest {
     @Test
     public void findMemberWithPlatformTest(){
         Member member = Member.builder()
-                .profile("test")
+                .profileUrl("test")
                 .platform(Platform.GOOGLE)
                 .email("test")
-                .nickname("testuser1")
+                .name("testuser1")
                 .build();
         member.addMemberRole(MemberRole.USER);
         memberRepository.save(member);
 
-        Member result = memberRepository.findByEmail("test", Platform.GOOGLE).get();
+        Member result = memberRepository.findByEmailAndPlatform("test", Platform.GOOGLE).get();
 
         Assertions.assertEquals(member, result);
     }
@@ -33,10 +33,10 @@ public class MemberRepositoryTest {
     @Test
     public void existsByEmailAndPlatform(){
         Member member = Member.builder()
-                .profile("test")
+                .profileUrl("test")
                 .platform(Platform.GOOGLE)
                 .email("test")
-                .nickname("testuser1")
+                .name("testuser1")
                 .build();
         member.addMemberRole(MemberRole.USER);
         memberRepository.save(member);

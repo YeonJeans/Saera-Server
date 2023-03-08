@@ -29,8 +29,8 @@ public class SearchRepositoryTest {
     @Test
     public void searchRecent3(){
         //given
-        Member member1 = memberRepository.save(Member.builder().email("test1@gmail.com").nickname("testuser1").platform(Platform.GOOGLE).profile("testProfile").build());
-        Member member2 =  memberRepository.save(Member.builder().email("test2@gmail.com").nickname("testuser2").platform(Platform.GOOGLE).profile("testProfile").build());
+        Member member1 = memberRepository.save(Member.builder().email("test1@gmail.com").name("testuser1").platform(Platform.GOOGLE).profileUrl("testProfile").build());
+        Member member2 =  memberRepository.save(Member.builder().email("test2@gmail.com").name("testuser2").platform(Platform.GOOGLE).profileUrl("testProfile").build());
 
         Statement statement1 = statementRepository.save(Statement.builder().pitchX("").pitchY("").content("test1").build());
         Statement statement2 = statementRepository.save(Statement.builder().pitchX("").pitchY("").content("test2").build());

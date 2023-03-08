@@ -38,8 +38,10 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
-               "/swagger-ui/**",
-                "/v3/api-docs",
+                "/swagger-ui**",
+                "/swagger-ui/**",
+                "/v3/api-docs**",
+                "/v3/api-docs/**",
                 "/h2-console/**"
         );
     }
@@ -49,8 +51,8 @@ public class SecurityConfig {
 //        http
 //                .exceptionHandling()
 //                .authenticationEntryPoint(customAuthenticationEntryPoint);
- //       http.formLogin();
-  //     http.oauth2Login();
+//        http.formLogin();
+//        http.oauth2Login();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

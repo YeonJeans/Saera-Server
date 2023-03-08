@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 public class Login extends BaseTimeEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column
     private String refreshToken;
 

@@ -21,6 +21,9 @@ public class Custom {
     @Column(nullable = false)
     private String content;
 
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] file;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String pitchX;
 

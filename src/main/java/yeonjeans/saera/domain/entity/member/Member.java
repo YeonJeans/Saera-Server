@@ -52,8 +52,8 @@ public class Member extends BaseTimeEntity {
         this.profileUrl = profileUrl;
     }
 
-    public void setXp(int xp) {
-        this.xp = xp;
+    public void addXp(int xp) {
+        this.xp = this.xp + xp;
     }
 
     public void addMemberRole(MemberRole memberRole){

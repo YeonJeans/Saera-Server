@@ -17,18 +17,18 @@ public class Practice extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "LONGBLOB")
-    private Byte[] file;
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] file;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String pitchX;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String pitchY;
 
     private Double score;
 
-    private Integer Count;
+    private Integer count;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -38,7 +38,7 @@ public class Practice extends BaseTimeEntity {
     private Long fk;
 
     @Builder
-    public Practice(Member member, Byte[] file, String pitchX, String pitchY, Double score, ReferenceType type, Long fk) {
+    public Practice(Member member, byte[] file, String pitchX, String pitchY, Double score, ReferenceType type, Long fk) {
         this.member = member;
         this.file = file;
         this.pitchX = pitchX;
@@ -46,13 +46,14 @@ public class Practice extends BaseTimeEntity {
         this.score = score;
         this.type = type;
         this.fk = fk;
+        this.count = 1;
     }
 
     public void setCount(Integer count) {
-        Count = count;
+        this.count = count;
     }
 
-    public void setFile(Byte[] file) {
+    public void setFile(byte[] file) {
         this.file = file;
     }
 

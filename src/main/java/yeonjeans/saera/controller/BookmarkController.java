@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
@@ -23,24 +24,7 @@ public class BookmarkController {
 
     private final BookmarkServiceImpl bookmarkService;
 
-    @Operation(summary = "즐겨찾기 문장 조회", description = "즐겨찾기 된 문장 리스트가 제공됩니다.", tags = { "Bookmark Controller" },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-            }
-    )
-    @GetMapping("/bookmark")
-    public ResponseEntity<?> returnBookmarkList(@RequestHeader String authorization){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthMember principal = (AuthMember) authentication.getPrincipal();
-
-        List<StateListItemDto> list = bookmarkService.getList(principal.getId());
-        return ResponseEntity.ok().body(list);
-    }
-
-    @Operation(summary = "즐겨찾기 생성", description = "statement_id를 사용하여 bookmark를 등록합니다.", tags = { "Bookmark Controller" },
+    @Operation(summary = "즐겨찾기 생성", description = "type과 id를 사용하여 즐겨찾기 생성", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -48,16 +32,18 @@ public class BookmarkController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
-    @PostMapping("/bookmark/{id}")
-    public ResponseEntity<?> createBookmark(@PathVariable Long id, @RequestHeader String authorization){
+    @PostMapping("/bookmark")
+    public ResponseEntity<?> createBookmark(@RequestParam(value = "type", required = true)ReferenceType type,
+                                            @RequestParam(value = "fk", required = true) Long fk,
+                                            @RequestHeader String authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        bookmarkService.create(id, principal.getId());
+        bookmarkService.create(type, fk, principal.getId());
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "즐겨찾기 삭제", description = "statement_id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
+    @Operation(summary = "즐겨찾기 삭제", description = "type과 id를 사용하여 Bookmark를 삭제합니다.", tags = { "Bookmark Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "삭제 성공"),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -65,12 +51,14 @@ public class BookmarkController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             }
     )
-    @DeleteMapping("/bookmark/{id}")
-    public ResponseEntity<?> deleteBookmark(@PathVariable Long id, @RequestHeader String authorization){
+    @DeleteMapping("/bookmark")
+    public ResponseEntity<?> deleteBookmark(@RequestParam(value = "type", required = true)ReferenceType type,
+                                            @RequestParam(value = "fk", required = true) Long fk,
+                                            @RequestHeader String authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        bookmarkService.delete(id, principal.getId());
+        bookmarkService.delete(type, fk, principal.getId());
         return ResponseEntity.ok().build();
     }
 }

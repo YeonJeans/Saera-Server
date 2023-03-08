@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
     STATEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 예시 문장을 찾을 수 없습니다."),
+    WORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 예시 단어를 찾을 수 없습니다."),
+    CUSTOM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자 정의 문장을 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 정보를 찾을 수 없습니다"),
     BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "즐겨찾기 정보를 찾을 수 없습니다."),
     PRACTICED_NOT_FOUND(HttpStatus.NOT_FOUND, "학습 내역을 찾을 수 없습니다."),

@@ -20,6 +20,22 @@ public class StateListItemDto {
     private Boolean practiced;
     private Boolean bookmarked;
 
+    public StateListItemDto(Object[] result){
+        Statement statement = result[0] instanceof Statement ? ((Statement) result[0]) : null;
+        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
+        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
+
+        this.id = statement.getId();
+        this.practiced = practice != null;
+        this.bookmarked = bookmark != null;
+
+        this.content = statement.getContent();
+        this.tags = statement.getTags().stream()
+                .map(statementTag -> statementTag.getTag().getName())
+                .collect(Collectors.toList());
+        this.date = practiced ? practice.getModifiedDate() : null;
+    }
+
 
     public StateListItemDto(Practice practice, Long memberId) {
 //        this.practiced = true;

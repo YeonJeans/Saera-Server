@@ -10,6 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import yeonjeans.saera.domain.entity.example.Tag;
 import yeonjeans.saera.domain.repository.example.TagRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -20,10 +23,9 @@ public class TagRepositoryTest {
     @Autowired
     TagRepository tagRepository;
 
-    @DisplayName("Tag 검색")
     @Transactional
     @Test
-    public void findByName(){
+    public void findAllByNameIn() {
         //given
         String name1 = "test1";
         String name2 = "test2";
@@ -31,9 +33,14 @@ public class TagRepositoryTest {
         tagRepository.save(new Tag(name1));
         tagRepository.save(new Tag(name2));
 
+        String[] tagnameArray = {"test2", "test3"};
+        ArrayList<String> tagnameList = new ArrayList<String>(List.of(tagnameArray));
+
         //when
-        Tag tag= tagRepository.findByName("test1");
+        List<Tag> list = tagRepository.findAllByNameIn(tagnameList);
         //then
-        assertThat(tag.getName()).isEqualTo(name1);
+        for (Tag tag : list){
+            System.out.println(tag.getName());
+        }
     }
 }

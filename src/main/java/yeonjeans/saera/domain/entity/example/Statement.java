@@ -19,8 +19,8 @@ public class Statement {
     @Column(nullable = false)
     private String content;
 
-    @Column(columnDefinition = "LONGBLOB")
-    private Byte[] file;
+    @Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] file;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String pitchX;
@@ -32,7 +32,7 @@ public class Statement {
     private List<StatementTag> tags;
 
     @Builder
-    public Statement(String content, String pitchX, String pitchY, Byte[] file) {
+    public Statement(String content, String pitchX, String pitchY, byte[] file) {
         this.content = content;
         this.pitchX = pitchX;
         this.pitchY = pitchY;
