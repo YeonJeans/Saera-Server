@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.StatementService;
 import yeonjeans.saera.dto.NameIdDto;
-import yeonjeans.saera.dto.StateListItemDto;
+import yeonjeans.saera.dto.ListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
@@ -63,7 +63,7 @@ public class StatementController {
 
     @Operation(summary = "문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 문장리스트를 검색합니다.", tags = { "Statement Controller" },
             responses = {
-                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
+                @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         }
@@ -79,7 +79,7 @@ public class StatementController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        List<StateListItemDto> list;
+        List<ListItemDto> list;
         if(bookmarked) list = statementService.getBookmarkedStatements(principal.getId());
         else if(practiced) list = statementService.getPracticedStatements(principal.getId());
         else list = statementService.getStatements(content, tags, principal.getId());
@@ -89,7 +89,7 @@ public class StatementController {
 
     @Operation(summary = "오늘의 인기 문장 Top5", description = "오늘의 인기 문장 Top5를 제공합니다.", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),}
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),}
     )
     @GetMapping("/top5-statement")
     public ResponseEntity<?> returnStatementList(){

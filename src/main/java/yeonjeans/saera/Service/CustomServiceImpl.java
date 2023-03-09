@@ -22,8 +22,8 @@ import yeonjeans.saera.domain.repository.custom.CTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomCTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.dto.ListItemDto;
 import yeonjeans.saera.dto.NameIdDto;
-import yeonjeans.saera.dto.CustomListItemDto;
 import yeonjeans.saera.dto.CustomResponseDto;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.exception.CustomException;
@@ -183,7 +183,7 @@ public class CustomServiceImpl {
         return audioBytes;
     }
 
-    public List<CustomListItemDto> getCustoms(String content, ArrayList<String> tags, Long memberId) {
+    public List<ListItemDto> getCustoms(String content, ArrayList<String> tags, Long memberId) {
     Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Stream<Object[]> stream;
@@ -196,7 +196,7 @@ public class CustomServiceImpl {
         }else{
             stream = searchByTagList(tags, member);
         }
-        return stream.map(CustomListItemDto::new).collect(Collectors.toList());
+        return stream.map(ListItemDto::new).collect(Collectors.toList());
     }
 
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {

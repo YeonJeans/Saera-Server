@@ -18,7 +18,7 @@ import yeonjeans.saera.domain.repository.PracticeRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.repository.example.StatementRepository;
 import yeonjeans.saera.dto.NameIdDto;
-import yeonjeans.saera.dto.StateListItemDto;
+import yeonjeans.saera.dto.ListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.CustomException;
 
@@ -60,22 +60,22 @@ public class StatementServiceImpl implements StatementService {
         return new StatementResponseDto(statement, bookmark, practice);
     }
 
-    public List<StateListItemDto> getPracticedStatements(Long memberId){
+    public List<ListItemDto> getPracticedStatements(Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         List<Object[]> list = statementRepository.findPracticed(member, ReferenceType.STATEMENT);
-        return list.stream().map(StateListItemDto::new).collect(Collectors.toList());
+        return list.stream().map(ListItemDto::new).collect(Collectors.toList());
     }
 
-    public List<StateListItemDto> getBookmarkedStatements(Long memberId){
+    public List<ListItemDto> getBookmarkedStatements(Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         List<Object[]> list = statementRepository.findBookmarked(member, ReferenceType.STATEMENT);
-        return list.stream().map(StateListItemDto::new).collect(Collectors.toList());
+        return list.stream().map(ListItemDto::new).collect(Collectors.toList());
     }
 
     @Override
-    public List<StateListItemDto> getStatements(String content, ArrayList<String> tags, Long memberId){
+    public List<ListItemDto> getStatements(String content, ArrayList<String> tags, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         Stream<Object[]> stream;
@@ -89,7 +89,7 @@ public class StatementServiceImpl implements StatementService {
         }else{
             stream = searchByTagList(tags, member);
         }
-        return stream.map(StateListItemDto::new).collect(Collectors.toList());
+        return stream.map(ListItemDto::new).collect(Collectors.toList());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class CustomController {
 
     @Operation(summary = "사용자 정의 문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 사용자 정의 문장 리스트를 검색합니다.", tags = { "Custom Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
@@ -61,7 +61,7 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        List<CustomListItemDto> list;
+        List<ListItemDto> list;
         list = customService.getCustoms(content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
