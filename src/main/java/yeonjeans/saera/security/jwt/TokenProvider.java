@@ -89,33 +89,4 @@ public class TokenProvider {
         UserDetails userDetails = userDetailService.loadUserByUsername(this.getMemberId(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
-
-    public String createAccessTokenForTest(Long memberId, String nickname) {
-        Date now = new Date();
-        Map<String , String> map = new HashMap<>();
-        map.put("id", String.valueOf(memberId));
-        map.put("name", nickname);
-
-        String accessToken = Jwts.builder()
-                .setClaims(map)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + 60*3*1000L))
-                .signWith(key)
-                .compact();
-
-        return accessToken;
-    }
-
-    public String createRefreshTokenForTest(Long memberId) {
-        Date now = new Date();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(String.valueOf(memberId))
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+ 60*5*1000L))
-                .signWith(key)
-                .compact();
-
-        return refreshToken;
-    }
 }

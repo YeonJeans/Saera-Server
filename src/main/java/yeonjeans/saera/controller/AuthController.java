@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import yeonjeans.saera.Service.MemberService;
-import yeonjeans.saera.Service.MemberServiceImpl;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.entity.member.Platform;
@@ -26,7 +25,6 @@ import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
-import yeonjeans.saera.security.jwt.TokenProvider;
 import yeonjeans.saera.security.service.OAuthService;
 
 @Log4j2
@@ -37,8 +35,6 @@ public class AuthController {
     private final OAuthService oAuthService;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
-    private final TokenProvider tokenProvider;
-    private final MemberServiceImpl memberServiceImpl;
 
     @Operation(summary = "토큰 발급", description = "구글 Server Auth Code를 통해 유저 정보를 받아오고, 토큰 발급합니다.",
             responses = {
@@ -100,21 +96,5 @@ public class AuthController {
             return ResponseEntity.ok().body(dto);
         }
         throw new CustomException(ErrorCode.BEARER_ERROR);
-    }
-
-    @GetMapping("test/accessToken")
-    public ResponseEntity<?> testAuthToken(@RequestParam(required = true) String email){
-        Member member = memberRepository.findByEmailAndPlatform(email, Platform.GOOGLE).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        String token = tokenProvider.createAccessTokenForTest(member.getId(), member.getName());
-        return ResponseEntity.ok().body(token);
-    }
-
-    @GetMapping("test/refreshToken")
-    public ResponseEntity<?> testRefreshToken(@RequestParam(required = true) String email){
-        Member member = memberRepository.findByEmailAndPlatform(email, Platform.GOOGLE).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-        String token = tokenProvider.createRefreshTokenForTest(member.getId());
-
-        memberServiceImpl.saveRefreshToken(member, token);
-        return ResponseEntity.ok().body(token);
     }
 }
