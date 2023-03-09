@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
         http.authorizeRequests()
-                .antMatchers("/test/**", "/reissue-token", "/auth/**", "/top5-statement").permitAll()
+                .antMatchers("/test/**", "/reissue-token", "/auth/**", "/top5-statement", "/words").permitAll()
                 .anyRequest().authenticated();
 
         return http.build();

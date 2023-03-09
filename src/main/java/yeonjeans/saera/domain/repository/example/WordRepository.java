@@ -3,6 +3,7 @@ package yeonjeans.saera.domain.repository.example;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import yeonjeans.saera.domain.entity.example.Tag;
 import yeonjeans.saera.domain.entity.example.Word;
 import yeonjeans.saera.domain.entity.member.Member;
 
@@ -15,4 +16,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "LEFT JOIN Practice p ON w.id = p.fk AND p.type = 1 AND p.member = :member " +
             "WHERE w.id = :wordId")
     List<Object[]> findByIdWithBookmarkAndPractice(@Param("member") Member member, @Param("wordId")Long wordId);
+
+    List<Word> findAllByTagId(Long tagId);
 }

@@ -4,14 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.Tag;
 import yeonjeans.saera.domain.entity.example.Word;
 import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.example.TagRepository;
 import yeonjeans.saera.domain.repository.example.WordRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.WordResponseDto;
 import yeonjeans.saera.exception.CustomException;
+import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static yeonjeans.saera.exception.ErrorCode.*;
 
@@ -33,5 +37,11 @@ public class WordServiceImpl {
         Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
 
         return new WordResponseDto(word, bookmark, practice);
+    }
+
+    public List<Long> getWordIdList(Long tagId) {
+        List<Word> wordList = wordRepository.findAllByTagId(tagId);
+        if(wordList.isEmpty()) throw new CustomException(TAG_NOT_FOUND);
+        return wordList.stream().map(Word::getId).collect(Collectors.toList());
     }
 }

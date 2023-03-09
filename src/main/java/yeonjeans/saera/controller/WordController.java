@@ -8,14 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.WordServiceImpl;
 import yeonjeans.saera.dto.WordResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,5 +35,18 @@ public class WordController {
 
         WordResponseDto dto = wordService.getWord(id, principal.getId());
         return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(summary = "태그 별 단어 id list", description = "단어 tag_id를 통해 단어 id list 제공합니다.", tags = { "Word Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = WordResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            })
+    @GetMapping("/words")
+    public ResponseEntity<?> returnWordIdList(@RequestParam(value = "tag_id", defaultValue = "false") Long id) {
+        List<Long> list = wordService.getWordIdList(id);
+        return ResponseEntity.ok().body(list);
     }
 }
