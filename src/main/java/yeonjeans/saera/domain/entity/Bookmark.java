@@ -4,12 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.member.Member;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Getter
 @Entity

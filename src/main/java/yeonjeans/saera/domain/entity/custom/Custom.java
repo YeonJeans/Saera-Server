@@ -4,11 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import yeonjeans.saera.domain.entity.member.Member;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Getter
 @Entity
@@ -33,13 +36,18 @@ public class Custom {
     @OneToMany(mappedBy = "custom")
     private List<CustomCtag> tags;
 
+    @ManyToOne
+    private Member member;
+
     @CreatedDate
     private LocalDateTime createdDate;
 
     @Builder
-    public Custom(String content, String pitchX, String pitchY) {
+    public Custom(String content, String pitchX, String pitchY, byte[] file, Member member) {
         this.content = content;
         this.pitchX = pitchX;
         this.pitchY = pitchY;
+        this.file = file;
+        this.member = member;
     }
 }
