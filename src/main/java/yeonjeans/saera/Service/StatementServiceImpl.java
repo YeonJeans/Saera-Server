@@ -38,7 +38,6 @@ import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 public class StatementServiceImpl implements StatementService {
     private final StatementRepository statementRepository;
     private final MemberRepository memberRepository;
-    private final SearchRepository searchRepository;
     private final WebClient webClient;
 
     private final String MLserverBaseUrl;
@@ -83,7 +82,7 @@ public class StatementServiceImpl implements StatementService {
 
         Stream<Object[]> stream;
         if(content==null&&tags==null){
-            return statementRepository.findAllWithBookmarkAndPractice(member).stream().map(StateListItemDto::new).collect(Collectors.toList());
+            stream = statementRepository.findAllWithBookmarkAndPractice(member).stream();
         }else if(content!=null&&tags!=null){
             stream = Stream.concat(statementRepository.findAllByContentContaining(member,'%'+content+'%').stream(), searchByTagList(tags, member))
                     .distinct();
@@ -92,20 +91,7 @@ public class StatementServiceImpl implements StatementService {
         }else{
             stream = searchByTagList(tags, member);
         }
-        return stream.map(i->addSearchHistory(i, member)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<StateListItemDto> getSearchHistory(Long memberId, int pageSize) {
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-
-        Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "modifiedDate"));
-        Page<Search> page = searchRepository.findAllByMemberOrderByCreatedDateDesc(member, pageable);
-
-        List<Long> idList = page.get().map(i->i.getStatement().getId()).collect(Collectors.toList());
-
-        return statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream()
-                .map(StateListItemDto::new).collect(Collectors.toList());
+        return stream.map(StateListItemDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -133,11 +119,5 @@ public class StatementServiceImpl implements StatementService {
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {
         List<Long> idList = statementRepository.findAllByTagnameIn(tags);
         return statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
-    }
-
-    @Transactional
-    StateListItemDto addSearchHistory(Object[] objects, Member member){
-        searchRepository.save(new Search(member,(Statement) objects[0]));
-        return new StateListItemDto(objects);
     }
 }

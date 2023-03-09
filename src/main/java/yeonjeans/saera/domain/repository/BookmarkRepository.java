@@ -13,9 +13,9 @@ import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
-    public List<Bookmark> findAllByMemberAndAndType(Member member, ReferenceType type);
+    public List<Bookmark> findAllByMemberAndType(Member member, ReferenceType type);
 
-    public Optional<Bookmark> findByMemberAndTypeAndFk(Member member,ReferenceType type, Long fk);
+    public Optional<Bookmark> findByMemberAndTypeAndFk(Member member, ReferenceType type, Long fk);
 
     public Boolean existsByMemberAndTypeAndFk(Member member, ReferenceType type, Long fk);
 }

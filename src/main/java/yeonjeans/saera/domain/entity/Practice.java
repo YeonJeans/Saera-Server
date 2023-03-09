@@ -33,8 +33,10 @@ public class Practice extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @Column(nullable = false)
     private ReferenceType type;
 
+    @Column(nullable = false)
     private Long fk;
 
     @Builder

@@ -119,7 +119,7 @@ public class WebClientTest {
                     headers.set("X-NCP-APIGW-API-KEY", CLOVA_SECRET);
                 })
                 .body(BodyInserters.fromFormData
-                                ("speaker", "nara")
+                                ("speaker", "vhyeri")
                                 .with("text", content)
                                 .with("format", "wav"))
                 .retrieve()

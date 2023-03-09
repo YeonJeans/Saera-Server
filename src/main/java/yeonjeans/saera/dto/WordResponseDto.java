@@ -11,7 +11,7 @@ public class WordResponseDto {
     private String notation;
     private String pronunciation;
     private String definition;
-    private String tag;
+    private Long tag_id;
 
     private Boolean bookmarked;
     private Boolean practiced;
@@ -21,7 +21,7 @@ public class WordResponseDto {
         this.notation = word.getNotation();
         this.pronunciation = word.getPronunciation();
         this.definition = word.getDefinition();
-        this.tag = word.getTag().getName();
+        this.tag_id = word.getTag().getId();
 
         this.bookmarked = bookmark != null;
         this.practiced = practice != null;

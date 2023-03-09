@@ -22,7 +22,7 @@ import yeonjeans.saera.security.dto.AuthMember;
 public class WordController {
     private final WordServiceImpl wordService;
 
-    @Operation(summary = "단어(발음 학습) 세부 조회", description = "word_id를 이용하여 word 레코드를 단건 조회합니다.",
+    @Operation(summary = "단어(발음 학습) 세부 조회", description = "word_id를 이용하여 word 레코드를 단건 조회합니다.", tags = { "Word Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = WordResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
