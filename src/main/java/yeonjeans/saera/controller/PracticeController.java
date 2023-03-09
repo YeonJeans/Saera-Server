@@ -22,7 +22,7 @@ import yeonjeans.saera.security.dto.AuthMember;
 
 @RequiredArgsConstructor
 @RestController
-public class PracticedController {
+public class PracticeController {
     private final PracticeServiceImpl practicedService;
 
     @Operation(summary = "유저 음성 파일 조회", description = "type과 id를 사용하여 유저의 음성 녹음 파일을 제공합니다.", tags = { "Practiced Controller" },
