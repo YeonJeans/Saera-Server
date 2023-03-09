@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.StatementService;
+import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
@@ -82,6 +83,17 @@ public class StatementController {
         if(bookmarked) list = statementService.getBookmarkedStatements(principal.getId());
         else if(practiced) list = statementService.getPracticedStatements(principal.getId());
         else list = statementService.getStatements(content, tags, principal.getId());
+
+        return ResponseEntity.ok().body(list);
+    }
+
+    @Operation(summary = "오늘의 인기 문장 Top5", description = "오늘의 인기 문장 Top5를 제공합니다.", tags = { "Statement Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = StateListItemDto.class)))}),}
+    )
+    @GetMapping("/top5-statement")
+    public ResponseEntity<?> returnStatementList(){
+        List<NameIdDto> list = statementService.getTop5Statements();
 
         return ResponseEntity.ok().body(list);
     }

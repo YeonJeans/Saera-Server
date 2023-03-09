@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import yeonjeans.saera.domain.entity.custom.CTag;
 
+@AllArgsConstructor
 @Getter
-public class CTagListItemDto {
+public class NameIdDto {
     private String name;
     private Long id;
 
-    public CTagListItemDto(CTag cTag) {
+    public NameIdDto(CTag cTag) {
         this.name = cTag.getName();
         this.id = cTag.getId();
     }

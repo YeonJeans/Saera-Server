@@ -120,7 +120,7 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        List<CTagListItemDto> list = customService.getTagList(principal.getId());
+        List<NameIdDto> list = customService.getTagList(principal.getId());
         return ResponseEntity.ok().body(list);
     }
 }

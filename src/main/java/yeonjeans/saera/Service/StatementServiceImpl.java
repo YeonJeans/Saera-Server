@@ -3,6 +3,8 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,8 +14,10 @@ import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.PracticeRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.repository.example.StatementRepository;
+import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.CustomException;
@@ -31,6 +35,7 @@ import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 public class StatementServiceImpl implements StatementService {
     private final StatementRepository statementRepository;
     private final MemberRepository memberRepository;
+    private final PracticeRepository practiceRepository;
     private final WebClient webClient;
 
     private final String MLserverBaseUrl;
@@ -107,6 +112,21 @@ public class StatementServiceImpl implements StatementService {
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();
+    }
+
+    @Override
+    public List<NameIdDto> getTop5Statements() {
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Long> fkList = practiceRepository.findTop5ByCount(ReferenceType.STATEMENT, pageable);
+
+        if(fkList.size() < 5){
+            fkList.addAll(practiceRepository.findRestTop5ByCount(ReferenceType.STATEMENT, Pageable.ofSize(5 - fkList.size())));
+        }
+
+        List<Statement> statementList = statementRepository.findAllById(fkList);
+        return statementList.stream()
+                .map(statement ->new NameIdDto(statement.getContent(), statement.getId()))
+                .collect(Collectors.toList());
     }
 
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {

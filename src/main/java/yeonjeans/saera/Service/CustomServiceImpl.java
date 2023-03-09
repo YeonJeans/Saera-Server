@@ -22,11 +22,10 @@ import yeonjeans.saera.domain.repository.custom.CTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomCTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
-import yeonjeans.saera.dto.CTagListItemDto;
+import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.CustomListItemDto;
 import yeonjeans.saera.dto.CustomResponseDto;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
-import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 
@@ -110,9 +109,9 @@ public class CustomServiceImpl {
         if(bookmark != null) bookmarkRepository.delete(bookmark);
     }
 
-    public List<CTagListItemDto> getTagList(Long memberId) {
+    public List<NameIdDto> getTagList(Long memberId) {
         List<CTag> cTagList = cTagRepository.findAllByMemberId(memberId);
-        return cTagList.stream().map(CTagListItemDto::new).collect(Collectors.toList());
+        return cTagList.stream().map(NameIdDto::new).collect(Collectors.toList());
     }
 
     public CustomResponseDto read(Long id, Long memberId) {
