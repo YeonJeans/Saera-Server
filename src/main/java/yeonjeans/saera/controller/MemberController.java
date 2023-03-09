@@ -30,7 +30,7 @@ import yeonjeans.saera.security.service.OAuthService;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-public class AuthController {
+public class MemberController {
 
     private final OAuthService oAuthService;
     private final MemberService memberService;
