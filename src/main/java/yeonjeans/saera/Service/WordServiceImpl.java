@@ -14,6 +14,7 @@ import yeonjeans.saera.dto.WordResponseDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,8 @@ public class WordServiceImpl {
     public List<Long> getWordIdList(Long tagId) {
         List<Word> wordList = wordRepository.findAllByTagId(tagId);
         if(wordList.isEmpty()) throw new CustomException(TAG_NOT_FOUND);
-        return wordList.stream().map(Word::getId).collect(Collectors.toList());
+        List<Long> idList = wordList.stream().map(Word::getId).collect(Collectors.toList());
+        Collections.shuffle(idList);
+        return idList;
     }
 }
