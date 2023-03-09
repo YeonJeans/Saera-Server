@@ -1,7 +1,6 @@
 package yeonjeans.saera.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,11 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.BookmarkServiceImpl;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
-import yeonjeans.saera.dto.StateListItemDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
