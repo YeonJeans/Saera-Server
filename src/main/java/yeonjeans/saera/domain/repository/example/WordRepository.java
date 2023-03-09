@@ -11,8 +11,8 @@ import java.util.List;
 public interface WordRepository extends JpaRepository<Word, Long> {
     @Query("SELECT w, b, p " +
             "FROM Word w " +
-            "LEFT JOIN Bookmark b ON w.id = b.fk AND b.type = 'WORD' AND b.member = :member " +
-            "LEFT JOIN Practice p ON w.id = p.fk AND p.type = 'WORD' AND p.member = :member " +
+            "LEFT JOIN Bookmark b ON w.id = b.fk AND b.type = 1 AND b.member = :member " +
+            "LEFT JOIN Practice p ON w.id = p.fk AND p.type = 1 AND p.member = :member " +
             "WHERE w.id = :wordId")
     List<Object[]> findByIdWithBookmarkAndPractice(@Param("member") Member member, @Param("wordId")Long wordId);
 }
