@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +33,7 @@ public class WordController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/words/{id}")
-    public ResponseEntity<WordResponseDto> returnWord(@PathVariable Long id, @RequestHeader String authorization){
+    public ResponseEntity<WordResponseDto> returnWord(@PathVariable Long id, @RequestHeader String Authorization, @RequestHeader String test){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -46,8 +49,24 @@ public class WordController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/words")
-    public ResponseEntity<?> returnWordIdList(@RequestParam(value = "tag_id", defaultValue = "false") Long id) {
+    public ResponseEntity<?> returnWordIdList(@RequestParam(value = "tag_id", required = true) Long id) {
         List<Long> list = wordService.getWordIdList(id);
         return ResponseEntity.ok().body(list);
+    }
+
+    @Operation(summary = "단어 예시 음성 조회", description = "word_id를 이용하여 예시 음성을 조회 합니다.", tags = { "Word Controller"},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            })
+    @GetMapping("/words/record/{id}")
+    public ResponseEntity<?> returnExampleRecord(@PathVariable Long id){
+        Resource resource = wordService.getRecord(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("audio", "wav"));
+
+        return ResponseEntity.ok().headers(headers).body(resource);
     }
 }

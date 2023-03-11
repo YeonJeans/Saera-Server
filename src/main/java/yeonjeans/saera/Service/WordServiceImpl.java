@@ -1,9 +1,14 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
+import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.domain.entity.example.Tag;
 import yeonjeans.saera.domain.entity.example.Word;
 import yeonjeans.saera.domain.entity.member.Member;
@@ -46,5 +51,17 @@ public class WordServiceImpl {
         List<Long> idList = wordList.stream().map(Word::getId).collect(Collectors.toList());
         Collections.shuffle(idList);
         return idList;
+    }
+
+    public Resource getRecord(Long id){
+        Word word = wordRepository.findById(id)
+                .orElseThrow(()->new CustomException(WORD_NOT_FOUND));
+
+        return new ByteArrayResource(word.getFile()) {
+            @Override
+            public String getFilename() {
+                return "audio.wav";
+            }
+        };
     }
 }
