@@ -38,9 +38,6 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        System.out.println(requestDto.getContent());
-        System.out.println(requestDto.getTags());
-
         CustomResponseDto dto =  customService.create(requestDto.getContent(), requestDto.getTags(), principal.getId());
         return ResponseEntity.ok().body(dto);
     }
@@ -53,7 +50,7 @@ public class CustomController {
             }
     )
     @GetMapping("/customs")
-    public ResponseEntity<?> returnStatementList(
+    public ResponseEntity<?> returnCustomList(
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
             @RequestHeader String authorization
@@ -108,7 +105,7 @@ public class CustomController {
 
     @Operation(summary = "사용자 정의 태그 조회", description = "사용자가 정의한 문장의 태그 목록을 조회합니다.", tags = { "Custom Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "성공" ),
+                    @ApiResponse(responseCode = "200", description = "성공" , content = { @Content(array = @ArraySchema(schema = @Schema(implementation = NameIdDto.class)))}),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
