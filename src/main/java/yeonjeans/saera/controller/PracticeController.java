@@ -45,7 +45,6 @@ public class PracticeController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("audio", "wav"));
         return ResponseEntity.ok().headers(headers).body(resource);
-
     }
 
     @Operation(summary = "학습 정보 조회", description = "type과 id를 사용하여 학습정보를 제공합니다..", tags = { "Practiced Controller" },
@@ -56,7 +55,7 @@ public class PracticeController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
-    @GetMapping("/practiced")
+    @GetMapping("/practice")
     public ResponseEntity<?> returnPracticed(@RequestParam(value = "type", required = true) ReferenceType type,
                                              @RequestParam(value = "fk", required = true) Long fk,
                                              @RequestHeader String authorization) {
@@ -75,7 +74,7 @@ public class PracticeController {
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
-    @PostMapping(value = "/practiced", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/practice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
