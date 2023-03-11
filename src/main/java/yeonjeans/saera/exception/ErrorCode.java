@@ -25,9 +25,12 @@ public enum ErrorCode {
 
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
     STATEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 예시 문장을 찾을 수 없습니다."),
+    WORD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 예시 단어를 찾을 수 없습니다."),
+    CUSTOM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자 정의 문장을 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 정보를 찾을 수 없습니다"),
     BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "즐겨찾기 정보를 찾을 수 없습니다."),
     PRACTICED_NOT_FOUND(HttpStatus.NOT_FOUND, "학습 내역을 찾을 수 없습니다."),
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 발음 학습 태그를 찾을 수 없습니다."),
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "데이터가 이미 존재합니다"),

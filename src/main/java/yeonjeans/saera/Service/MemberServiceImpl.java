@@ -3,10 +3,10 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
-import yeonjeans.saera.domain.Login;
-import yeonjeans.saera.domain.LoginRepository;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
+import yeonjeans.saera.domain.entity.member.Login;
+import yeonjeans.saera.domain.repository.member.LoginRepository;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.exception.CustomException;
@@ -25,7 +25,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public TokenResponseDto login(Member request) {
-        TokenResponseDto dto = tokenProvider.generateToken(request.getId(), request.getNickname());
+        TokenResponseDto dto = tokenProvider.generateToken(request.getId(), request.getName());
         saveRefreshToken(request, dto.getRefreshToken());
         return dto;
     }
@@ -33,7 +33,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public TokenResponseDto join(Member request) {
         Member member = memberRepository.save(request);
-        TokenResponseDto dto = tokenProvider.generateToken(member.getId(), member.getNickname());
+        TokenResponseDto dto = tokenProvider.generateToken(member.getId(), member.getName());
         saveRefreshToken(request, dto.getRefreshToken());
         return dto;
     }
@@ -47,7 +47,7 @@ public class MemberServiceImpl implements MemberService {
         }
         else{
             login = loginRepository.save(
-                    Login.builder().RefreshToken(refreshToken).member(member).build()
+                    Login.builder().refreshToken(refreshToken).member(member).build()
             );
         }
         loginRepository.save(login);
@@ -64,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
         if(subject!=null && memberId != Long.parseLong(subject)) throw new CustomException(ErrorCode.REISSUE_FAILURE);
 
         String nickname = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND))
-                .getNickname();
+                .getName();
 
         TokenResponseDto dto = tokenProvider.generateToken(memberId, nickname);
         stored.setRefreshToken(dto.getRefreshToken());
@@ -77,10 +77,18 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         return MemberInfoResponseDto.builder()
-                .name(member.getNickname())
+                .name(member.getName())
                 .email(member.getEmail())
-                .profileUrl(member.getProfile())
+                .profileUrl(member.getProfileUrl())
                 .xp(member.getXp())
                 .build();
+    }
+
+    @Override
+    public MemberInfoResponseDto updateMember(Long id, String name) {
+        Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.setNickname(name);
+        return new MemberInfoResponseDto(memberRepository.save(member));
     }
 }

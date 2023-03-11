@@ -14,7 +14,8 @@ import static yeonjeans.saera.exception.ErrorCode.DUPLICATE_RESOURCE;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = { ConstraintViolationException.class, DataIntegrityViolationException.class})
-    protected ResponseEntity<ErrorResponse> handleDataException() {
+    protected ResponseEntity<ErrorResponse> handleDataException(Exception e) {
+        e.printStackTrace();
         return ErrorResponse.toResponseEntity(DUPLICATE_RESOURCE);
     }
 

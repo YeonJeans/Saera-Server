@@ -1,14 +1,16 @@
 package yeonjeans.saera.dto;
 
 import lombok.Data;
-import yeonjeans.saera.domain.statement.Statement;
+import yeonjeans.saera.domain.entity.Bookmark;
+import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.util.Parsing;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class StatementResponseDto<Bookmarked> {
+public class StatementResponseDto {
     private Long id;
     private String content;
     private List<Integer> pitch_x;
@@ -18,10 +20,7 @@ public class StatementResponseDto<Bookmarked> {
     private Boolean bookmarked;
     private Boolean practiced;
 
-    private String nickname;
-    private String profileUrl;
-
-    public StatementResponseDto(Statement state, Long memberId, String nickname, String profileUrl) {
+    public StatementResponseDto(Statement state, Bookmark bookmark, Practice practice){
         this.id = state.getId();
         this.content = state.getContent();
         this.pitch_x = Parsing.stringToIntegerArray(state.getPitchX());
@@ -30,11 +29,7 @@ public class StatementResponseDto<Bookmarked> {
                 .map(statementTag -> statementTag.getTag().getName())
                 .collect(Collectors.toList());
 
-        this.bookmarked = state.getBookmarks().stream().anyMatch(bookmark -> bookmark.getMember().getId().equals(memberId));
-        this.practiced = state.getPracticeds().stream().anyMatch(practiced -> practiced.getMember().getId().equals(memberId));
-
-        this.nickname = nickname;
-        this.profileUrl = profileUrl;
+        this.bookmarked = bookmark != null;
+        this.practiced = practice != null;
     }
-
 }

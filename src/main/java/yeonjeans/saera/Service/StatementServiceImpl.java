@@ -3,23 +3,26 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import yeonjeans.saera.domain.Search;
-import yeonjeans.saera.domain.SearchRepository;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRepository;
-import yeonjeans.saera.domain.statement.*;
-import yeonjeans.saera.dto.StateListItemDto;
+
+import yeonjeans.saera.domain.entity.Bookmark;
+import yeonjeans.saera.domain.entity.Practice;
+import yeonjeans.saera.domain.entity.example.ReferenceType;
+import yeonjeans.saera.domain.entity.example.Statement;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.PracticeRepository;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
+import yeonjeans.saera.dto.NameIdDto;
+import yeonjeans.saera.dto.ListItemDto;
+import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,10 +34,10 @@ import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 @Service
 public class StatementServiceImpl implements StatementService {
     private final StatementRepository statementRepository;
-    private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
-    private final SearchRepository searchRepository;
+    private final PracticeRepository practiceRepository;
     private final WebClient webClient;
+
     private final String MLserverBaseUrl;
     @Value("${ml.secret}")
     private String ML_SECRET;
@@ -44,41 +47,49 @@ public class StatementServiceImpl implements StatementService {
     private String CLOVA_SECRET;
 
     @Override
-    public Statement searchById(Long id) {
-        return statementRepository.findById(id).orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
+    public StatementResponseDto getStatement(Long id, Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+        List<Object[]> list = statementRepository.findByIdWithBookmarkAndPractice(member, id);
+        if(list.isEmpty()) throw new CustomException(STATEMENT_NOT_FOUND);
+        Object[] result = list.get(0);
+
+        Statement statement = result[0] instanceof Statement ? ((Statement) result[0]) : null;
+        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
+        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
+
+        return new StatementResponseDto(statement, bookmark, practice);
+    }
+
+    public List<ListItemDto> getPracticedStatements(Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+
+        List<Object[]> list = statementRepository.findPracticed(member, ReferenceType.STATEMENT);
+        return list.stream().map(ListItemDto::new).collect(Collectors.toList());
+    }
+
+    public List<ListItemDto> getBookmarkedStatements(Long memberId){
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+
+        List<Object[]> list = statementRepository.findBookmarked(member, ReferenceType.STATEMENT);
+        return list.stream().map(ListItemDto::new).collect(Collectors.toList());
     }
 
     @Override
-    public List<StateListItemDto> search(String content, ArrayList<String> tags, Long memberId){
+    public List<ListItemDto> getStatements(String content, ArrayList<String> tags, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
-        Stream<Statement> statementStream;
+        Stream<Object[]> stream;
         if(content==null&&tags==null){
-            statementStream = statementRepository.findAll().stream();
+            stream = statementRepository.findAllWithBookmarkAndPractice(member).stream();
         }else if(content!=null&&tags!=null){
-            statementStream =Stream.concat(statementRepository.findByContentContaining(content).stream(), searchByTagList(tags))
+            stream = Stream.concat(statementRepository.findAllByContentContaining(member,'%'+content+'%').stream(), searchByTagList(tags, member))
                     .distinct();
-
         }else if(content!=null){
-            statementStream = statementRepository.findByContentContaining(content).stream();
+            stream = statementRepository.findAllByContentContaining(member,'%'+content+'%').stream();
         }else{
-            statementStream =  searchByTagList(tags);
+            stream = searchByTagList(tags, member);
         }
-        return statementStream.map(i->addSearchHistory(i,member)).collect(Collectors.toList());
-
-    }
-
-    @Transactional
-    StateListItemDto addSearchHistory(Statement statement, Member member){
-        searchRepository.save(new Search(member, statement));
-        return new StateListItemDto(statement, member.getId());
-    }
-
-    @Override
-    public List<StateListItemDto> searchHistory(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
-        List<Search> list = searchRepository.findTop3ByMemberOrderByCreatedDateDesc(member);
-        return list.stream().map(item->new StateListItemDto(item.getStatement(), memberId)).collect(Collectors.toList());
+        return stream.map(ListItemDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -101,14 +112,25 @@ public class StatementServiceImpl implements StatementService {
                 .retrieve()
                 .bodyToMono(Resource.class)
                 .block();
-
     }
 
-    public Stream<Statement> searchByTagList(ArrayList<String> tags) {
-        return tags.stream().map(tagRepository::findByName)
-                .map(Tag::getStatements)
-                .flatMap(Collection::stream)
-                .map(StatementTag::getStatement)
-                .distinct();
+    @Override
+    public List<NameIdDto> getTop5Statements() {
+        Pageable pageable = PageRequest.of(0, 5);
+        List<Long> fkList = practiceRepository.findTop5ByCount(ReferenceType.STATEMENT, pageable);
+
+        if(fkList.size() < 5){
+            fkList.addAll(practiceRepository.findRestTop5ByCount(ReferenceType.STATEMENT, Pageable.ofSize(5 - fkList.size())));
+        }
+
+        List<Statement> statementList = statementRepository.findAllById(fkList);
+        return statementList.stream()
+                .map(statement ->new NameIdDto(statement.getContent(), statement.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {
+        List<Long> idList = statementRepository.findAllByTagnameIn(tags);
+        return statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
     }
 }

@@ -1,9 +1,9 @@
 package yeonjeans.saera.dto.oauth;
 
 import lombok.*;
-import yeonjeans.saera.domain.member.Member;
-import yeonjeans.saera.domain.member.MemberRole;
-import yeonjeans.saera.domain.member.Platform;
+import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.entity.member.MemberRole;
+import yeonjeans.saera.domain.entity.member.Platform;
 
 //구글(서드파티)로 액세스 토큰을 보내 받아올 구글에 등록된 사용자 정보
 @ToString
@@ -23,10 +23,10 @@ public class GoogleUser {
 
     public Member toMember(){
         Member member = Member.builder()
-                .profile(picture)
+                .profileUrl(picture)
                 .platform(Platform.GOOGLE)
                 .email(email)
-                .nickname(name)
+                .name(name)
                 .build();
         member.addMemberRole(MemberRole.USER);
         return member;
