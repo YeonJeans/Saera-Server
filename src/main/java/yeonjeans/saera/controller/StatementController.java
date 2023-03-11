@@ -89,7 +89,8 @@ public class StatementController {
 
     @Operation(summary = "오늘의 인기 문장 Top5", description = "오늘의 인기 문장 Top5를 제공합니다.", tags = { "Statement Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),}
+                    @ApiResponse(responseCode = "200", description = "조회 성공",
+                            content = { @Content(array = @ArraySchema(schema = @Schema(implementation = NameIdDto.class)))}),}
     )
     @GetMapping("/top5-statement")
     public ResponseEntity<?> returnStatementList(){

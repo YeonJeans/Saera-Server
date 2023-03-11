@@ -38,11 +38,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
-                "/swagger-ui**",
-                "/swagger-ui/**",
-                "/v3/api-docs**",
-                "/v3/api-docs/**",
-                "/h2-console/**"
+                "/v3/api-docs/**", "/h2-console/**"
         );
     }
 
@@ -61,7 +57,8 @@ public class SecurityConfig {
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
 
         http.authorizeRequests()
-                .antMatchers( "/reissue-token", "/auth/**", "/top5-statement", "/words").permitAll()
+                .antMatchers("/top5-statement", "/reissue-token", "/words", "/words/record/**", "/statements/record/**", "/today-list", "/auth/**").permitAll()
+                .antMatchers( "/swagger-ui/*").permitAll()
                 .anyRequest().authenticated();
 
         return http.build();
