@@ -10,10 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
@@ -78,6 +75,23 @@ public class MemberController {
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         MemberInfoResponseDto dto = memberService.getMemberInfo(principal.getId());
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(summary = "유저 정보 수정", description = "Access Token을 이용하여 유저 정보 수정",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = MemberInfoResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            }
+    )
+    @PatchMapping("/member")
+    public ResponseEntity<?> updateMemberInfo(@RequestBody(required = true) String name, @RequestHeader String authorization){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        MemberInfoResponseDto dto = memberService.updateMember(principal.getId(), name);
         return ResponseEntity.ok().body(dto);
     }
 

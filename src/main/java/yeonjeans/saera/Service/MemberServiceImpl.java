@@ -83,4 +83,12 @@ public class MemberServiceImpl implements MemberService {
                 .xp(member.getXp())
                 .build();
     }
+
+    @Override
+    public MemberInfoResponseDto updateMember(Long id, String name) {
+        Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.setNickname(name);
+        return new MemberInfoResponseDto(memberRepository.save(member));
+    }
 }

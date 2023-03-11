@@ -13,7 +13,9 @@ public interface MemberService {
     TokenResponseDto login(Member request);
 
     @Transactional
-    public TokenResponseDto reIssueToken(String refreshToken);
+    TokenResponseDto reIssueToken(String refreshToken);
 
-    public MemberInfoResponseDto getMemberInfo(Long memberId);
+   MemberInfoResponseDto getMemberInfo(Long memberId);
+
+    MemberInfoResponseDto updateMember(Long id, String name);
 }
