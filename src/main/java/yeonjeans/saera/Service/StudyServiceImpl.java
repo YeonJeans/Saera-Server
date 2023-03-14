@@ -27,6 +27,10 @@ public class StudyServiceImpl {
     private final StatementRepository statementRepository;
     private final WordRepository wordRepository;
 
+    private long dateSeed;
+    Set<Long> wordSet = new HashSet<>();
+    Set<Long> statementSet = new HashSet<>();
+
     @Transactional
     public List<Object> completeStudy(ReferenceType type, ArrayList<Long> idList, boolean isTodayStudy, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
@@ -38,7 +42,6 @@ public class StudyServiceImpl {
 
             idList = this.getIdList(type);
         }
-        System.out.println(idList);
         switch (type){
             case STATEMENT:
                 return statementRepository.findAllByIdWithBookmarkAndPractice(member, idList)
@@ -54,19 +57,98 @@ public class StudyServiceImpl {
         return null;
     }
 
-    public ArrayList<Long> getIdList(ReferenceType type){
-
+    public synchronized ArrayList<Long> getIdList(ReferenceType type){
         LocalDate currentDate = LocalDate.now();
         long seed = currentDate.toEpochDay();
-        Random random = new Random(seed);
 
-        int bound = ( type == STATEMENT ? 9 : 25);
-        Set<Long> set = new HashSet<>();
-        while (set.size() < 5) {
-            int randomNumber = random.nextInt(bound) + 1;
-            set.add((long) randomNumber);
+        if(seed != this.dateSeed) {
+            Random random = new Random(seed);
+
+            Set<Long> todayWordSet = new HashSet<>();
+            Set<Long> todayStatementSet = new HashSet<>();
+
+            while (todayWordSet.size() < 5) {
+                int randomNumber = random.nextInt(25) + 1;
+                if(!wordSet.contains((long) randomNumber))
+                    todayWordSet.add((long) randomNumber);
+            }
+
+            while (todayStatementSet.size() < 5) {
+                int randomNumber = random.nextInt(103) + 1;
+                if(!statementSet.contains((long) randomNumber))
+                    todayStatementSet.add((long) randomNumber);
+            }
+
+            this.statementSet = todayStatementSet;
+            this.wordSet = todayWordSet;
+            this.dateSeed = seed;
         }
-        ArrayList<Long> list = new ArrayList<>(set);
-        return list;
+        System.out.println(wordSet);
+        System.out.println(statementSet);
+        return type == STATEMENT ? new ArrayList<>(this.statementSet) : new ArrayList<>(this.wordSet);
    }
+
+    public synchronized ArrayList<Long> testSync(ReferenceType type, long date, int seq) throws InterruptedException {
+        //System.out.println("[ "+seq+" ]" +"enter method");
+        long seed = date;
+
+        if(seed != this.dateSeed) {
+            Random random = new Random(seed);
+
+            Set<Long> todayWordSet = new HashSet<>();
+            Set<Long> todayStatementSet = new HashSet<>();
+
+            while (todayWordSet.size() < 5) {
+                int randomNumber = random.nextInt(25) + 1;
+                System.out.println(randomNumber + " by " +seq);
+                if(!wordSet.contains((long) randomNumber))
+                    todayWordSet.add((long) randomNumber);
+            }
+
+            while (todayStatementSet.size() < 5) {
+                int randomNumber = random.nextInt(103) + 1;
+                if(!statementSet.contains((long) randomNumber))
+                    todayStatementSet.add((long) randomNumber);
+            }
+
+            this.statementSet = todayStatementSet;
+            this.wordSet = todayWordSet;
+            Thread.yield();
+            this.dateSeed = seed;
+        }
+        //System.out.println("[ "+seq+" ]" +"out method");
+        return type == STATEMENT ? new ArrayList<>(this.statementSet) : new ArrayList<>(this.wordSet);
+    }
+
+    public ArrayList<Long> testNonSync(ReferenceType type, long date, int seq) throws InterruptedException {
+        //System.out.println("[ "+seq+" ]" +"enter method");
+        long seed = date;
+
+        if(seed != this.dateSeed) {
+            Random random = new Random(seed);
+
+            Set<Long> todayWordSet = new HashSet<>();
+            Set<Long> todayStatementSet = new HashSet<>();
+
+            while (todayWordSet.size() < 5) {
+                int randomNumber = random.nextInt(25) + 1;
+                System.out.println(randomNumber + " by " +seq);
+                if(!wordSet.contains((long) randomNumber))
+                    todayWordSet.add((long) randomNumber);
+            }
+
+            while (todayStatementSet.size() < 5) {
+                int randomNumber = random.nextInt(103) + 1;
+                if(!statementSet.contains((long) randomNumber))
+                    todayStatementSet.add((long) randomNumber);
+            }
+
+            this.statementSet = todayStatementSet;
+            this.wordSet = todayWordSet;
+            Thread.yield();
+            this.dateSeed = seed;
+        }
+        //System.out.println("[ "+seq+" ]" +"out method");
+        return type == STATEMENT ? new ArrayList<>(this.statementSet) : new ArrayList<>(this.wordSet);
+    }
 }

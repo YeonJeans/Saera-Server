@@ -53,7 +53,7 @@ public class StudyController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/today-list")
-    public ResponseEntity<?> returnStatement(@RequestParam ReferenceType type){
+    public ResponseEntity<?> returnTodayIdList(@RequestParam ReferenceType type){
         ArrayList<Long> list = studyService.getIdList(type);
         return ResponseEntity.ok().body(list);
     }
