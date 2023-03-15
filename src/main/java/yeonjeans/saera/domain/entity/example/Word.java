@@ -24,7 +24,7 @@ public class Word {
 
     private String pronunciation;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Tag tag;
 
     @Builder
