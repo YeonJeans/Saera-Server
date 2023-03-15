@@ -19,12 +19,14 @@ public class ListItemDto {
     private Long id;
     private Boolean practiced;
     private Boolean bookmarked;
+    private Boolean recommended;
 
     public ListItemDto(Object[] result){
         Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
         Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
         this.practiced = practice != null;
         this.bookmarked = bookmark != null;
+        this.recommended = false;
 
         this.date = practiced ? practice.getModifiedDate() : null;
 
@@ -46,5 +48,23 @@ public class ListItemDto {
                     .map(customCtag -> customCtag.getTag().getName())
                     .collect(Collectors.toList());
         }
+    }
+
+    public ListItemDto(Object[] result, boolean recommended){
+        Statement statement = result[0] instanceof Statement ? ((Statement) result[0]) : null;
+        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
+        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
+        this.practiced = practice != null;
+        this.bookmarked = bookmark != null;
+
+        this.date = practiced ? practice.getModifiedDate() : null;
+
+        this.id = statement.getId();
+        this.content = statement.getContent();
+        this.tags = statement.getTags().stream()
+                .map(statementTag -> statementTag.getTag().getName())
+                .collect(Collectors.toList());
+
+        this.recommended = recommended;
     }
 }
