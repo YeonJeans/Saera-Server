@@ -22,7 +22,8 @@ public class BookmarkController {
 
     @Operation(summary = "즐겨찾기 생성", description = "type과 id를 사용하여 즐겨찾기 생성", tags = { "Bookmark Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공"),
+                    @ApiResponse(responseCode = "200", description = "요청 성공"),
+                    @ApiResponse(responseCode = "409", description = "중복된 즐겨찾기 요청", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -31,7 +32,7 @@ public class BookmarkController {
     @PostMapping("/bookmark")
     public ResponseEntity<?> createBookmark(@RequestParam(value = "type", required = true)ReferenceType type,
                                             @RequestParam(value = "fk", required = true) Long fk,
-                                            @RequestHeader String authorization) {
+                                            @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -50,7 +51,7 @@ public class BookmarkController {
     @DeleteMapping("/bookmark")
     public ResponseEntity<?> deleteBookmark(@RequestParam(value = "type", required = true)ReferenceType type,
                                             @RequestParam(value = "fk", required = true) Long fk,
-                                            @RequestHeader String authorization) {
+                                            @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 

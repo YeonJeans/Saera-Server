@@ -36,7 +36,7 @@ public class PracticeController {
     @GetMapping("/practice/record")
     public ResponseEntity returnPracticedRecord(@RequestParam(value = "type", required = true) ReferenceType type,
                                                 @RequestParam(value = "fk", required = true) Long fk,
-                                                @RequestHeader String authorization) {
+                                                @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -58,7 +58,7 @@ public class PracticeController {
     @GetMapping("/practice")
     public ResponseEntity<?> returnPracticed(@RequestParam(value = "type", required = true) ReferenceType type,
                                              @RequestParam(value = "fk", required = true) Long fk,
-                                             @RequestHeader String authorization) {
+                                             @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -70,12 +70,13 @@ public class PracticeController {
     @Operation(summary = "학습 정보 생성", description = "type과 id를 사용하여 학습 정보를 생성합니다.", tags = { "Practiced Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "422", description = "음성 파일 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @PostMapping(value = "/practice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String authorization) {
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 

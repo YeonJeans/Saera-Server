@@ -25,7 +25,7 @@ public class CustomController {
 
     @Operation(summary = "사용자 정의 문장 생성", description = "문장 내용(content), tag들을 이용해 사용자 정의 문장을 생성합니다.", tags = { "Custom Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = CustomResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = CustomResponseDto.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
@@ -33,7 +33,7 @@ public class CustomController {
     @PostMapping("/customs")
     public ResponseEntity<?> createCustom(
             @RequestBody(required = true)CustomRequestDto requestDto,
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
@@ -53,7 +53,7 @@ public class CustomController {
     public ResponseEntity<?> returnCustomList(
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
@@ -74,7 +74,7 @@ public class CustomController {
     @GetMapping("/customs/{id}")
     public ResponseEntity<?> returnCustom(
             @PathVariable(required = true) Long id,
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
@@ -93,7 +93,7 @@ public class CustomController {
     @DeleteMapping("/customs/{id}")
     public ResponseEntity<?> deleteCustom(
             @PathVariable(required = true) Long id,
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
@@ -112,7 +112,7 @@ public class CustomController {
     )
     @GetMapping("/customs/tags")
     ResponseEntity<?> returnCustomList(
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();

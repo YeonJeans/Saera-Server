@@ -37,7 +37,7 @@ public class StudyController {
     public ResponseEntity<?> returnStatement(@RequestParam(value = "type")ReferenceType type,
                                              @RequestParam(value = "idList", required = false) ArrayList<Long> idList,
                                              @RequestParam(value = "isTodayStudy", defaultValue = "false") boolean isTodayStudy,
-                                             @RequestHeader String authorization){
+                                             @RequestHeader String Authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -48,9 +48,6 @@ public class StudyController {
     @Operation(summary = "오늘의 학습 id list 조회", description = "type에 따라 오늘 학습할 대상의 id 리스트가 제공됩니다.", tags = { "Study Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = Long.class))),
-                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/today-list")
     public ResponseEntity<?> returnTodayIdList(@RequestParam ReferenceType type){
