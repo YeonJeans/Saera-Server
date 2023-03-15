@@ -1,5 +1,6 @@
 package yeonjeans.saera;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.util.Parsing;
@@ -30,12 +32,30 @@ public class WebClientTest {
     private String CLOVA_SECRET;
 
     @Test
+    public void getRecommend() {
+        String keyword = " ";
+        String response = webClient.get()
+                .uri(MLserverBaseUrl+"/semantic-search?query="+keyword)
+                .header("access-token", ML_SECRET)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        System.out.println(response);
+        System.out.println(new JSONObject(response).getJSONObject("0").getLong("id"));
+        System.out.println(new JSONObject(response).getJSONObject("1").getLong("id"));
+        System.out.println(new JSONObject(response).getJSONObject("2").getLong("id"));
+
+        Assertions.assertNotNull(response);
+    }
+
+    @Test
     public void getPitch() throws IOException {
         Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
 
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
-                .header("access-token",ML_SECRET)
+                .header("access-token", ML_SECRET)
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .bodyToMono(PitchGraphDto.class)
@@ -64,19 +84,6 @@ public class WebClientTest {
         Double dtwScore= new JSONObject(response).getDouble("DTW_score");
         Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
         Assertions.assertNotNull(dtwScore);
-
-//        dto로 바로 역직렬화 가능하게 test 중..
-//        ScoreResponseDto dto = webClient.post()
-//                .uri(MLserverBaseUrl + "score")
-//                .body(BodyInserters.fromValue(requestDto))
-//                .retrieve()
-//                .bodyToMono(ScoreResponseDto.class)
-//                .block();
-//
-//        Double dtwScore= dto.getDTW_score();
-//        System.out.println(dto.getDTW_score());
-//        System.out.println(dto.getMAPE_score());
-//        Assertions.assertNotNull(dtwScore);
     }
 
     @Test
@@ -97,7 +104,7 @@ public class WebClientTest {
         //when
         String response = webClient.post()
                 .uri(MLserverBaseUrl + "score")
-                .header("access-token",ML_SECRET)
+                .header("access-token", ML_SECRET)
                 .body(BodyInserters.fromValue(requestDto))
                 .retrieve()
                 .bodyToMono(String.class)
