@@ -56,8 +56,6 @@ public class WordRepositoryTest {
 
         wordList = wordRepository.findAllByTagIdNotIn(mainWordTagList);
 
-        for(Word word : wordList){
-            System.out.println(word.getNotation() + word.getTag().getName());
-        }
+        Assertions.assertFalse(wordList.isEmpty());
     }
 }
