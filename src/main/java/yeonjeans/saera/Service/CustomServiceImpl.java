@@ -203,4 +203,14 @@ public class CustomServiceImpl {
         List<Long> idList = customRepository.findAllByTagnameIn(tags);
         return customRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
     }
+
+    public Resource getExampleRecord(Long id) {
+        Custom custom = customRepository.findById(id).orElseThrow(()->new CustomException(CUSTOM_NOT_FOUND));
+        return new ByteArrayResource(custom.getFile()) {
+            @Override
+            public String getFilename() {
+                return "audio.wav";
+            }
+        };
+    }
 }
