@@ -12,4 +12,11 @@ import java.util.ArrayList;
 public class PitchGraphDto {
     ArrayList<Integer> pitch_x;
     ArrayList<Double> pitch_y;
+    Integer pitch_length;
+
+    public PitchGraphDto(ArrayList<Integer> pitch_x, ArrayList<Double> pitch_y){
+        this.pitch_x = pitch_x;
+        this.pitch_y = pitch_y;
+        this.pitch_length = null;
+    }
 }

@@ -1,6 +1,7 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PracticeServiceImpl implements PracticeService {
@@ -107,6 +109,7 @@ public class PracticeServiceImpl implements PracticeService {
         practice.setFile(audioBytes);
         practice.setPitchX(userGraph.getPitch_x().toString());
         practice.setPitchY(userGraph.getPitch_y().toString());
+        practice.setPitchLength(userGraph.getPitch_length());
         practice.setScore(score);
     };
 
@@ -118,7 +121,6 @@ public class PracticeServiceImpl implements PracticeService {
     private void  createPracticeCustom(PracticedRequestDto dto, Practice practice) {
         Custom custom = customRepository.findById(dto.getFk())
                 .orElseThrow(()->new CustomException(CUSTOM_NOT_FOUND));
-
 
         PitchGraphDto userGraph = getPitchGraph(dto.getRecord().getResource());
         PitchGraphDto targetGraph = new PitchGraphDto(Parsing.stringToIntegerArray(custom.getPitchX()), Parsing.stringToDoubleArray(custom.getPitchY()));
@@ -137,6 +139,7 @@ public class PracticeServiceImpl implements PracticeService {
         practice.setFile(audioBytes);
         practice.setPitchX(userGraph.getPitch_x().toString());
         practice.setPitchY(userGraph.getPitch_y().toString());
+        practice.setPitchLength(userGraph.getPitch_length());
         practice.setScore(score);
     };
 
@@ -147,6 +150,7 @@ public class PracticeServiceImpl implements PracticeService {
                 .body(BodyInserters.fromMultipartData("audio", resource))
                 .retrieve()
                 .onStatus(HttpStatus::isError, response -> {
+                    log.error(response.toString());
                     if(response.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
                         throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
                     throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);

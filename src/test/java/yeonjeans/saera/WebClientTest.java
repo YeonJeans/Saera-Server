@@ -33,9 +33,9 @@ public class WebClientTest {
 
     @Test
     public void getRecommend() {
-        String keyword = " ";
+        String keyword = "커피";
         String response = webClient.get()
-                .uri(MLserverBaseUrl+"/semantic-search?query="+keyword)
+                .uri(MLserverBaseUrl+"/semantic-search?top_n=3&query="+keyword)
                 .header("access-token", ML_SECRET)
                 .retrieve()
                 .bodyToMono(String.class)
@@ -62,6 +62,7 @@ public class WebClientTest {
                 .block();
 
         System.out.println(dto.getPitch_x());
+        System.out.println(dto.getPitch_length());
         Assertions.assertNotNull(dto.getPitch_x());
     }
 
