@@ -59,4 +59,11 @@ public interface StatementRepository extends JpaRepository<Statement, Long> {
         "JOIN StatementTag st ON s.id = st.statement.id AND st.tag.id IN "+
         "(SELECT t.id FROM Tag t WHERE t.name IN :tagnameList)")
     List<Long> findAllByTagnameIn(@Param("tagnameList") ArrayList<String> tagnameList);
+
+    @Query("SELECT s.id " +
+            "FROM Statement s " +
+            "JOIN StatementTag st ON s.id = st.statement.id AND st.tag.id IN "+
+            "(SELECT t.id FROM Tag t WHERE t.name IN :tagnameList)" +
+            "WHERE s.content LIKE :keyword")
+    List<Long> findAllByTagnameInAndContentContaining(@Param("tagnameList") ArrayList<String> tagnameList, @Param("keyword") String keyword);
 }
