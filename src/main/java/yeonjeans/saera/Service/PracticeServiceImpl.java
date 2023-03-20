@@ -113,17 +113,6 @@ public class PracticeServiceImpl implements PracticeService {
     private void createPracticeWord(PracticedRequestDto dto, Practice practice) {
         Word word = wordRepository.findById(dto.getFk())
                 .orElseThrow(()->new CustomException(WORD_NOT_FOUND));
-
-        byte[] audioBytes = new byte[0];
-        try {
-            InputStream inputStream = dto.getRecord().getInputStream();
-            audioBytes = StreamUtils.copyToByteArray(inputStream);
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        practice.setFile(audioBytes);
     };
 
     private void  createPracticeCustom(PracticedRequestDto dto, Practice practice) {

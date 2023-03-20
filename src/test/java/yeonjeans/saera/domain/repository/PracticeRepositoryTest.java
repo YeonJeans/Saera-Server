@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.member.Member;
@@ -20,13 +21,20 @@ public class PracticeRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
+    @Transactional
     @Test
     public void get(){
+        //when
         Long memberId = 1L;
         Member member = memberRepository.findById(memberId).get();
 
-        Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, 9L).get();
+        Practice practice1 = Practice.builder().type(ReferenceType.WORD).fk(1L).member(member).build();
+        practiceRepository.save(practice1);
 
+        //given
+        Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, ReferenceType.STATEMENT, 1L).get();
+
+        //then
         Assertions.assertNotNull(practice);
     }
 

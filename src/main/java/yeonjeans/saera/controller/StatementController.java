@@ -37,7 +37,7 @@ public class StatementController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @GetMapping("/statements/{id}")
-    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String authorization){
+    public ResponseEntity<StatementResponseDto> returnStatement(@PathVariable Long id, @RequestHeader String Authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -74,7 +74,7 @@ public class StatementController {
             @RequestParam(value = "practiced", defaultValue = "false") boolean practiced,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
-            @RequestHeader String authorization
+            @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();

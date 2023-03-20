@@ -20,6 +20,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     List<Object[]> findByIdWithBookmarkAndPractice(@Param("member") Member member, @Param("wordId")Long wordId);
 
     List<Word> findAllByTagId(Long tagId);
+    List<Word> findAllByTagIdNotIn(List<Long> tagIdList);
 
     @Query("SELECT w, b, p " +
             "FROM Word w " +

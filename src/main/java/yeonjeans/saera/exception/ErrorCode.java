@@ -34,7 +34,7 @@ public enum ErrorCode {
 
     /* 409 CONFLICT : Resource 의 현재 상태와 충돌. 보통 중복된 데이터 존재 */
     DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "데이터가 이미 존재합니다"),
-    ALREADY_BOOKMARKED(HttpStatus.CONFLICT, "이미 즐겨찾기 된 문장입니다."),
+    ALREADY_BOOKMARKED(HttpStatus.CONFLICT, "이미 즐겨찾기 상태입니다."),
 
     /*422 Unprocessable Entity :*/
     UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, "그래프 데이터를 받아올 수 없습니다.");

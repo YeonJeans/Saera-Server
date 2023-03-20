@@ -11,6 +11,8 @@ import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.example.WordRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
@@ -45,5 +47,15 @@ public class WordRepositoryTest {
         System.out.println("========================================================");
 
         Assertions.assertNotNull(w);
+    }
+
+    @Test
+    public void getEtcWordIdList(){
+        List<Long> mainWordTagList = new ArrayList<Long>(Arrays.asList(10L, 11L, 12L, 13L, 16L));
+        List<Word> wordList;
+
+        wordList = wordRepository.findAllByTagIdNotIn(mainWordTagList);
+
+        Assertions.assertFalse(wordList.isEmpty());
     }
 }

@@ -1,7 +1,6 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 import yeonjeans.saera.domain.entity.member.Login;
 import yeonjeans.saera.domain.repository.member.LoginRepository;
@@ -15,7 +14,6 @@ import yeonjeans.saera.security.jwt.TokenProvider;
 
 import java.util.Optional;
 
-@Log4j2
 @RequiredArgsConstructor
 @Repository
 public class MemberServiceImpl implements MemberService {
@@ -56,8 +54,6 @@ public class MemberServiceImpl implements MemberService {
     public TokenResponseDto reIssueToken(String refreshToken) throws CustomException {
         tokenProvider.validateToken(refreshToken);
         String subject = tokenProvider.getSubject(refreshToken);
-        System.out.println(subject);
-        log.error(subject);
         Login stored = loginRepository.findByRefreshToken(refreshToken).orElseThrow(()->new CustomException(ErrorCode.WRONG_TOKEN));
 
         Long memberId = stored.getMember().getId();

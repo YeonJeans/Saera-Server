@@ -70,7 +70,7 @@ public class MemberController {
             }
     )
     @GetMapping("/member")
-    public ResponseEntity<?> returnMemberInfo(@RequestHeader String authorization){
+    public ResponseEntity<?> returnMemberInfo(@RequestHeader String Authorization){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
@@ -87,7 +87,10 @@ public class MemberController {
             }
     )
     @PatchMapping("/member")
-    public ResponseEntity<?> updateMemberInfo(@RequestBody(required = true) String name, @RequestHeader String authorization){
+    public ResponseEntity<?> updateMemberInfo(
+            @RequestBody(required = true) String name,
+            @RequestHeader String Authorization
+    ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
