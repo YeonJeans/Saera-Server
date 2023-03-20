@@ -54,6 +54,7 @@ public class CustomController {
     )
     @GetMapping("/customs")
     public ResponseEntity<?> returnCustomList(
+            @RequestParam(value = "bookmarked", defaultValue = "false") boolean bookmarked,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
             @RequestHeader String Authorization
@@ -62,7 +63,7 @@ public class CustomController {
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         List<ListItemDto> list;
-        list = customService.getCustoms(content, tags, principal.getId());
+        list = customService.getCustoms(bookmarked, content, tags, principal.getId());
 
         return ResponseEntity.ok().body(list);
     }
