@@ -74,7 +74,7 @@ public class StudyServiceImpl {
             }
 
             while (todayStatementSet.size() < 5) {
-                int randomNumber = random.nextInt(103) + 1;
+                int randomNumber = random.nextInt(167) + 1;
                 if(!statementSet.contains((long) randomNumber))
                     todayStatementSet.add((long) randomNumber);
             }
