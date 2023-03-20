@@ -76,7 +76,7 @@ public class CreateStatement {
                 "일시불로 결제해 주세요.", "다 해서 얼마예요?", "비밀번호를 재발급 받고 싶어요.", "공인인증서 발급하고 싶어요.", "체크카드 만들려고 하는데요.",
                 "오이 알레르기가 있어요.", "근처에 약국은 어디에 있나요?", "타이레놀 있나요?", "여기서 세워 주세요.", "맛있게 드세요.",
 
-                "새해 복 많이 받으세요!", "즐거운 추석 보내세요.", "메리 크리스마스!", "휴대폰 충전해 주세요.", "술은 잘 못 마셔요.", // -> 새해복 많이 받으세요 중복 없앰..
+                "새해 복 많이 받으세요!", "즐거운 추석 보내세요.", "메리 크리스마스!", "휴대폰 충전해 주세요.", "술은 잘 못 마셔요.",
                 "수돗물이 안 나와요.", "따뜻한 물이 안 나와요.", "옆집이 너무 시끄러워요.", "변기가 막혔어요.", "보일러가 고장났어요.",
 
                 "지하철역에서 얼마나 걸려요?", "이 버스는 어디로 가나요?", "여기 와이파이 되나요?", "먹고 싶은 음식이 있나요?", "편안한 밤 되시길 바래요.",
@@ -87,59 +87,42 @@ public class CreateStatement {
 
                 "지금 집에 가야해서요.", "노래 추천해주세요.", "뜨거우니까 조심하세요.", "영수증 드릴까요?", "내일까지 해 볼게요.",
                 "내일로 미룰 수 있을까요?", "이따가 미팅 있어요.", "조금만 더 주세요.", "아무거나 다 좋아.", "저는 상관 없어요.",
-
-                "그거 좋은 것 같아.", "그건 좀 별로야.", "마음에 안 들어."
         };
 
-        List<Statement> statementList = Arrays.stream(contentArray).map(this::makeStatement).collect(Collectors.toList());
+        String[] contentArray2 = {
+                "그거 좋은 것 같아.", "그건 좀 별로야.", "마음에 안 들어.", "잇몸이 아파요.", "치과 검진 하러 왔어요.",
+                "영화는 무슨 장르에요?", "세관 서류 필요해요?", "길을 잃어버렸어요.", "지금 체크아웃하고 싶어요.", "버스 요금은 얼마인가요?",
+
+                "연세를 여쭤보아도 될까요?", "당근은 빼주세요.", "이번 주말에 캠핑갈래요?", "이번에 새로 입사한 길동입니다.", "송금 수수료는 얼마인가요?",
+                "보증금은 얼마예요?", "여권을 잃어버린 것 같아요.", "계좌 이체를 하고 싶습니다.", "통장을 만들고 싶습니다.", "저축 예금 계좌를 개설하고 싶습니다.",
+
+                "전화주신 분 성함을 알 수 있을까요?", "이따가 다시 전화해 주실 수 있으세요?", "시간내주셔서 감사합니다.", "여기 제 명함입니다.", "무슨 일로 찾으셨어요?",
+                "잘 부탁드립니다.", "다음에는 제가 사겠습니다.", "다음 주에 휴가를 가도 될까요?", "내일까지 보고서를 올리겠습니다.", "오늘 막 입사했습니다.",
+
+                "근무지가 어디인가요?", "이직을 희망하고 있습니다.", "회사에서 근무한 경험이 있나요?", "앞으로도 잘 부탁드립니다.", "별 말씀을요.",
+                "어제는 너무 재밌었습니다.", "주말에 일정이 있나요?", "토요일에는 시간이 안될 것 같아요.", "회의 시간을 늦춰도 될까요?", "다음에 제가 찾아뵙겠습니다.",
+
+                "뭐 좀 여쭤봐도 될까요?", "좀 더 큰 사이즈가 있을까요?", "할인되는 상품이 있을까요?", "저는 지금 우울해요.", "즐겨 듣는 음악이 있나요?",
+                "이 박스를 같이 들어줄 수 있을까요?", "역사 책을 빌릴 수 있을까?", "진료비는 어디서 납부하면 될까요?", "어떻게 오셨어요?", "손에 화상을 입었어요.",
+
+                "발목을 삐었어요.", "진단서를 받을 수 있을까요?", "진료 예약할 수 있을까요?", "조금만 기다려 주시겠어요?", "미안합니다.",
+                "바람이 시원하다.", "전화번호가 어떻게 되나요?", "주민등록등본 떼러 왔는데요.", "주말 잘 보내고 월요일에 만납시다.", "먼저 들어가보겠습니다.",
+
+                "안 먹겠습니다.", "언제 배송이 시작되나요?", "언제까지 물품을 받아볼 수 있나요?", "너는 어떻게 생각해?", "오늘도 화이팅합시다.", "제가 해보겠습니다.",
+                "환절기 감기 조심하세요."
+        };
+
+        List<Statement> statementList = Arrays.stream(contentArray2).map(this::makeStatement).collect(Collectors.toList());
         statementRepo.saveAll(statementList);
+//
+//        String[] tagNameArray1 = {"일상", "은행/공공기관", "소비", "회사", "인사"}; //0 1 2 3 4
+//        String[] tagNameArray2 = {"의문문", "존댓말", "부정문", "감정표현"}; //0 1 2 3
+//        String[] tagNameArray3 = {"구개음화", "두음법칙", "치조마찰음화", "ㄴ첨가", "ㄹ첨가", "여→애", "단모음화", "으→우", "어→오", "오→어", "모음조화"};
+//
+//        List<Tag> tagList1 = Arrays.stream(tagNameArray1).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
+//        List<Tag> tagList2 = Arrays.stream(tagNameArray2).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
+//        List<Tag> tagList3 = Arrays.stream(tagNameArray3).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
 
-        String[] tagNameArray1 = {"일상", "은행/공공기관", "소비", "회사", "인사"}; //0 1 2 3 4
-        String[] tagNameArray2 = {"의문문", "존댓말", "부정문", "감정표현"}; //0 1 2 3
-        String[] tagNameArray3 = {"구개음화", "두음법칙", "치조마찰음화", "ㄴ첨가", "ㄹ첨가", "여→애", "단모음화", "으→우", "어→오", "오→어", "모음조화"};
-        String[] tagNameArray4 = {"축약", "부정어강조", "이 역행동화", "하→해", "자음탈락", "말토막억양", "어→오", "게→기", "강조"};
-
-        List<Tag> tagList1 = Arrays.stream(tagNameArray1).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
-        List<Tag> tagList2 = Arrays.stream(tagNameArray2).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
-        List<Tag> tagList3 = Arrays.stream(tagNameArray3).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
-        List<Tag> tagList4 = Arrays.stream(tagNameArray4).map(Tag::new).map(tag->tagRepo.save(tag)).collect(Collectors.toList());
-
-        //화장실은 어디에 있나요?
-        statementTagRepo.save(new StatementTag(statementList.get(0), tagList1.get(0)));//일상
-        statementTagRepo.save(new StatementTag(statementList.get(0), tagList2.get(0)));//의문문
-        statementTagRepo.save(new StatementTag(statementList.get(0), tagList2.get(1)));//존댓말
-        //신분증은 안 가져왔는데요.
-        statementTagRepo.save(new StatementTag(statementList.get(1), tagList1.get(1)));//은행/공공기관
-        statementTagRepo.save(new StatementTag(statementList.get(1), tagList2.get(2)));//부정문
-        statementTagRepo.save(new StatementTag(statementList.get(1), tagList2.get(1)));//존댓말
-        statementTagRepo.save(new StatementTag(statementList.get(1), tagList3.get(0)));//축약
-        statementTagRepo.save(new StatementTag(statementList.get(1), tagList3.get(1)));//부정어강조
-        //본인인데도 안 되나요?
-        statementTagRepo.save(new StatementTag(statementList.get(2), tagList1.get(1)));//은행/공공기관
-        statementTagRepo.save(new StatementTag(statementList.get(2), tagList2.get(0)));//의문문
-        statementTagRepo.save(new StatementTag(statementList.get(2), tagList2.get(1)));//존댓말
-        statementTagRepo.save(new StatementTag(statementList.get(2), tagList3.get(1)));//부정어강조
-        //괜찮습니다.
-        statementTagRepo.save(new StatementTag(statementList.get(3), tagList1.get(0)));//일상
-        statementTagRepo.save(new StatementTag(statementList.get(3), tagList2.get(1)));//존댓말
-        statementTagRepo.save(new StatementTag(statementList.get(3), tagList3.get(8))); //강조
-        //안녕하세요?
-        statementTagRepo.save(new StatementTag(statementList.get(4), tagList1.get(4)));//인사
-        statementTagRepo.save(new StatementTag(statementList.get(4), tagList2.get(1)));//존댓말
-        //이건 얼마예요?
-        statementTagRepo.save(new StatementTag(statementList.get(5), tagList1.get(2))); //소비
-        statementTagRepo.save(new StatementTag(statementList.get(5), tagList2.get(1))); //존댓말
-        statementTagRepo.save(new StatementTag(statementList.get(5), tagList2.get(0))); //의문문
-        statementTagRepo.save(new StatementTag(statementList.get(5), tagList3.get(2))); //이 역행동화
-        //언제 한 번 놀러오세요.
-        statementTagRepo.save(new StatementTag(statementList.get(6), tagList1.get(0))); //일상
-        statementTagRepo.save(new StatementTag(statementList.get(6), tagList2.get(1))); //존댓말
-        //공연 보러 가자
-        statementTagRepo.save(new StatementTag(statementList.get(7), tagList1.get(0))); //일상
-        //넌 좋아하는 게 뭐야?
-        statementTagRepo.save(new StatementTag(statementList.get(8), tagList1.get(1))); //일상
-        statementTagRepo.save(new StatementTag(statementList.get(8), tagList4.get(3))); //하->해
-        statementTagRepo.save(new StatementTag(statementList.get(8), tagList2.get(0))); //의문문
     }
 
     @Test

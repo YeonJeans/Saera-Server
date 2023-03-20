@@ -61,7 +61,8 @@ public class CustomServiceImpl {
 
     @Transactional
     public CustomResponseDto create(String content, ArrayList<String> tags, Long memberId){
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         byte[] audioBytes = getTTS(content);
         ByteArrayResource audioResource = new ByteArrayResource(audioBytes) {
@@ -183,11 +184,14 @@ public class CustomServiceImpl {
         return audioBytes;
     }
 
-    public List<ListItemDto> getCustoms(String content, ArrayList<String> tags, Long memberId) {
+    public List<ListItemDto> getCustoms(boolean bookmarked, String content, ArrayList<String> tags, Long memberId) {
     Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Stream<Object[]> stream;
-        if(content==null&&tags==null){
+        if(bookmarked){
+            stream = customRepository.findBookmarkedAllAndPractice(member).stream();
+        }
+        else if(content==null&&tags==null){
             stream = customRepository.findAllWithBookmarkAndPractice(member).stream();
         }else if(content!=null&&tags!=null){
             stream = Stream.concat(customRepository.findAllByContentContaining(member,'%'+content+'%').stream(), searchByTagList(tags, member)).distinct();
@@ -202,5 +206,15 @@ public class CustomServiceImpl {
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {
         List<Long> idList = customRepository.findAllByTagnameIn(tags);
         return customRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
+    }
+
+    public Resource getExampleRecord(Long id) {
+        Custom custom = customRepository.findById(id).orElseThrow(()->new CustomException(CUSTOM_NOT_FOUND));
+        return new ByteArrayResource(custom.getFile()) {
+            @Override
+            public String getFilename() {
+                return "audio.wav";
+            }
+        };
     }
 }

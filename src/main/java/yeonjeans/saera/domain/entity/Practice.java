@@ -26,6 +26,8 @@ public class Practice extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String pitchY;
 
+    private Integer pitchLength;
+
     private Double score;
 
     private Integer count;
@@ -66,6 +68,8 @@ public class Practice extends BaseTimeEntity {
     public void setPitchY(String pitchY) {
         this.pitchY = pitchY;
     }
+
+    public void setPitchLength(Integer pitchLength) { this.pitchLength = pitchLength; }
 
     public void setScore(Double score) {
         this.score = score;

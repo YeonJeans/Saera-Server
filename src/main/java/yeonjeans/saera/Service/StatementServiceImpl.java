@@ -86,12 +86,13 @@ public class StatementServiceImpl implements StatementService {
         if(content==null&&tags==null){
             stream = statementRepository.findAllWithBookmarkAndPractice(member).stream();
         }else if(content!=null&&tags!=null){
-            stream = Stream.concat(statementRepository.findAllByContentContaining(member,'%'+content+'%').stream(), searchByTagList(tags, member))
-                    .distinct();
+            List<Long> idList = statementRepository.findAllByTagnameInAndContentContaining(tags, '%'+content+'%');
+            stream = statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
         }else if(content!=null){
             stream = statementRepository.findAllByContentContaining(member,'%'+content+'%').stream();
         }else{
-            stream = searchByTagList(tags, member);
+            List<Long> idList = statementRepository.findAllByTagnameIn(tags);
+            stream = statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
         }
 
         if(content != null){
@@ -159,7 +160,6 @@ public class StatementServiceImpl implements StatementService {
                 .bodyToMono(String.class)
                 .block();
 
-        System.out.println(response);
         recommendIdList.add(new JSONObject(response).getJSONObject("0").getLong("id"));
         recommendIdList.add(new JSONObject(response).getJSONObject("1").getLong("id"));
         recommendIdList.add(new JSONObject(response).getJSONObject("2").getLong("id"));

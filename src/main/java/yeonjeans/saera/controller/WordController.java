@@ -14,10 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.WordServiceImpl;
+import yeonjeans.saera.dto.ListItemDto;
+import yeonjeans.saera.dto.WordListItemDto;
 import yeonjeans.saera.dto.WordResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -48,7 +51,7 @@ public class WordController {
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
-    @GetMapping("/words")
+    @GetMapping("/word-id")
     public ResponseEntity<?> returnWordIdList(@RequestParam(value = "tag_id", required = true) Long id) {
         List<Long> list = wordService.getWordIdList(id);
         return ResponseEntity.ok().body(list);
@@ -67,5 +70,25 @@ public class WordController {
         headers.setContentType(new MediaType("audio", "wav"));
 
         return ResponseEntity.ok().headers(headers).body(resource);
+    }
+
+    @Operation(summary = "단어 리스트 조회", description = "단어 리스트 조회", tags = { "Word Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            }
+    )
+    @GetMapping("/words")
+    public ResponseEntity<?> returnStatementList(
+            @RequestParam(value = "bookmarked", defaultValue = "false") boolean bookmarked,
+            @RequestHeader String Authorization
+    ){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        List<WordListItemDto> list = wordService.getWordList(bookmarked, principal.getId());
+
+        return ResponseEntity.ok().body(list);
     }
 }

@@ -54,12 +54,14 @@ public class MemberServiceImpl implements MemberService {
     public TokenResponseDto reIssueToken(String refreshToken) throws CustomException {
         tokenProvider.validateToken(refreshToken);
         String subject = tokenProvider.getSubject(refreshToken);
-        Login stored = loginRepository.findByRefreshToken(refreshToken).orElseThrow(()->new CustomException(ErrorCode.WRONG_TOKEN));
+        Login stored = loginRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(()->new CustomException(ErrorCode.WRONG_TOKEN));
 
         Long memberId = stored.getMember().getId();
         if(subject!=null && memberId != Long.parseLong(subject)) throw new CustomException(ErrorCode.REISSUE_FAILURE);
 
-        String nickname = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND))
+        String nickname = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND))
                 .getName();
 
         TokenResponseDto dto = tokenProvider.generateToken(memberId, nickname);

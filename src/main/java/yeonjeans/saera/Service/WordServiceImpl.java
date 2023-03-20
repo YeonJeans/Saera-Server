@@ -4,20 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
-import yeonjeans.saera.domain.entity.example.ReferenceType;
-import yeonjeans.saera.domain.entity.example.Statement;
-import yeonjeans.saera.domain.entity.example.Tag;
 import yeonjeans.saera.domain.entity.example.Word;
 import yeonjeans.saera.domain.entity.member.Member;
-import yeonjeans.saera.domain.repository.example.TagRepository;
 import yeonjeans.saera.domain.repository.example.WordRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.dto.WordListItemDto;
 import yeonjeans.saera.dto.WordResponseDto;
 import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +43,7 @@ public class WordServiceImpl {
     }
 
     public List<Long> getWordIdList(Long tagId) {
-        List<Long> mainWordTagList = new ArrayList<Long>(Arrays.asList(10L, 11L, 12L, 13L, 16L));
+        List<Long> mainWordTagList = new ArrayList<>(Arrays.asList(10L, 11L, 12L, 13L, 16L));
         List<Word> wordList;
 
         if(tagId == 0) wordList = wordRepository.findAllByTagIdNotIn(mainWordTagList);
@@ -71,5 +66,17 @@ public class WordServiceImpl {
                 return "audio.wav";
             }
         };
+    }
+
+    public List<WordListItemDto> getWordList(boolean bookmarked, Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
+
+        if(bookmarked){
+            return wordRepository.findBookmarkedWordsByMember(member).stream()
+                    .map(WordListItemDto::new).collect(Collectors.toList());
+        }
+        return wordRepository.findAllWithMember(member).stream()
+                .map(WordListItemDto::new).collect(Collectors.toList());
     }
 }
