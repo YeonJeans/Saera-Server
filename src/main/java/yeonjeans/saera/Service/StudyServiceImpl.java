@@ -68,7 +68,7 @@ public class StudyServiceImpl {
             Set<Long> todayStatementSet = new HashSet<>();
 
             while (todayWordSet.size() < 5) {
-                int randomNumber = random.nextInt(25) + 1;
+                int randomNumber = random.nextInt(39) + 1;
                 if(!wordSet.contains((long) randomNumber))
                     todayWordSet.add((long) randomNumber);
             }
