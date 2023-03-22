@@ -8,7 +8,7 @@ import yeonjeans.saera.domain.entity.example.ReferenceType;
 
 @Getter
 @AllArgsConstructor
-public class PracticedRequestDto {
+public class PracticeRequestDto {
     private ReferenceType type;
     private Long fk;
     private MultipartFile record;
