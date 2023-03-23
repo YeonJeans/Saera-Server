@@ -16,6 +16,7 @@ import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.entity.member.Platform;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
+import yeonjeans.saera.dto.PracticeDaysResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.dto.oauth.GoogleUser;
 import yeonjeans.saera.exception.CustomException;
@@ -95,6 +96,23 @@ public class MemberController {
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         MemberInfoResponseDto dto = memberService.updateMember(principal.getId(), name);
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(summary = "연속 학습 일수 조회", description = "Access Token을 이용하여 유저의 연속 학습 일수를 조회합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticeDaysResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            }
+    )
+    @GetMapping("/get-attendance-days")
+    public ResponseEntity<?> returnAttendanceDays(@RequestHeader String Authorization) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        PracticeDaysResponseDto dto = memberService.getPracticeDays(principal.getId());
         return ResponseEntity.ok().body(dto);
     }
 

@@ -12,6 +12,9 @@ import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
@@ -42,17 +45,34 @@ public class PracticeRepositoryTest {
     public void getTop5() {
         Pageable pageable = PageRequest.of(0, 5);
         List<Long> list = practiceRepository.findTop5ByCount(ReferenceType.STATEMENT, pageable);
-        System.out.println(list.size());
+        System.out.println("list size: " + list.size());
+
+        if(list.size() < 5){
+            list.addAll(practiceRepository.findRestTop5ByCount(ReferenceType.STATEMENT, Pageable.ofSize(5 - list.size())));
+        }
+        System.out.println("list size: " + list.size());
 
         for(Long id: list){
             System.out.println(id);
         }
 
-        List<Long> list2 = practiceRepository.findRestTop5ByCount(ReferenceType.STATEMENT, pageable);
-        System.out.println(list2.size());
+        Assertions.assertEquals(list.size(), 5);
+    }
 
-        for(Long id: list2){
-            System.out.println(id);
-        }
+    @Test
+    public void didYouLearn() {
+        Member member = memberRepository.findById(1L).get();
+
+       Practice practice = practiceRepository.findFirstByMemberOrderByModifiedDateDesc(member).get();
+
+       LocalDate lastPracticeDate = practice.getModifiedDate().toLocalDate();
+
+        System.out.println(LocalDate.now());
+        System.out.println(LocalDate.now().minusDays(1));
+        System.out.println(lastPracticeDate.isEqual(LocalDate.now()));
+
+        lastPracticeDate = null;
+        if(lastPracticeDate == null || lastPracticeDate.isEqual(LocalDate.now() ))
+            System.out.println("test");
     }
 }

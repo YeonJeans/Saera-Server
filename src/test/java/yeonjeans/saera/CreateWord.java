@@ -40,34 +40,23 @@ public class CreateWord {
     @Transactional
     @Test
     public void creatData(){
-        String[] notaionArray = {
-                "굳이",
-                "역사",
-                "여자",
-                "아주머니",
-                "같이",
-                "맏이",
-                "기적",
-                "일요일",
-                "월요일",
-                "활용하다",
-                "이발소",
-                "예의",
-                "이용하다",
-                "따로",
-                "낭비",
-                "며칠",
-                "관심",
-                "뮤지컬",
-                "마을",
-                "얼마나",
-                "공부",
-                "교회",
-                "신용카드",
-                "그런데",
-                "음악"
-        };
-        List<Word> wordList = Arrays.stream(notaionArray).map(this::makeWord).collect(Collectors.toList());
+        String[] notationArray = {
+                "굳이", "역사", "여자", "아주머니", "같이",
+                "맏이", "기적", "일요일", "월요일", "활용하다",
+
+                "이발소", "예의", "이용하다", "따로", "낭비",
+                "며칠", "관심", "뮤지컬", "마을", "얼마나",
+
+                "공부", "교회", "신용카드", "그런데", "음악"
+        };//25
+
+        String[] notationArray2 = {
+            "붙이다", "닫히다", "양심", "요리", "이유",
+                "래일", "예절", "그리다", "독려", "베갯잇",
+                "나랏일", "혜택", "깻잎", "시장"
+        };//39
+
+        List<Word> wordList = Arrays.stream(notationArray2).map(this::makeWord).collect(Collectors.toList());
         wordRepository.saveAll(wordList);
     }
 

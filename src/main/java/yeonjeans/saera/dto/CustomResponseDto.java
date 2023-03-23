@@ -1,8 +1,6 @@
 package yeonjeans.saera.dto;
 
 import lombok.Getter;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.custom.Custom;
