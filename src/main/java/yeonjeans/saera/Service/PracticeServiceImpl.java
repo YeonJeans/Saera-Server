@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,8 +23,8 @@ import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.repository.PracticeRepository;
 import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.domain.repository.example.StatementRepository;
-import yeonjeans.saera.dto.PracticedRequestDto;
-import yeonjeans.saera.dto.PracticedResponseDto;
+import yeonjeans.saera.dto.PracticeRequestDto;
+import yeonjeans.saera.dto.PracticeResponseDto;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.exception.CustomException;
@@ -38,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,21 +57,23 @@ public class PracticeServiceImpl implements PracticeService {
     private String ML_SECRET;
 
     @Transactional
-    public Practice create(PracticedRequestDto dto, Long memberId){
-        LocalDate currentDate = LocalDate.now();
+    public Practice create(PracticeRequestDto dto, Long memberId){
+        LocalDate todayDate = LocalDate.now();
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, dto.getType(), dto.getFk()).orElse(null);
+        LocalDate lastPracticeDate = getLastPracticeDate(member);
 
+        //경험치
         if(practice == null){
             member.addXp(dto.getType() != ReferenceType.WORD ? XP_STATEMENT : XP_WORD);
             practice = Practice.builder().member(member).fk(dto.getFk()).type(dto.getType()).build();
         }else {
-            LocalDateTime modifiedDate = practice.getModifiedDate();
-            if(modifiedDate.toLocalDate().isEqual(currentDate)){
-                if(!dto.isTodayStudy()) practice.setCount(practice.getCount()+1);
+            LocalDate modifiedDate = practice.getModifiedDate().toLocalDate();
+            if(modifiedDate.isEqual(todayDate)){
+                if(!dto.isTodayStudy()) practice.setCount(practice.getCount() + 1);
             }else{
-                practice.setCount(0);
+                practice.setCount(1);
             }
         }
 
@@ -79,16 +82,29 @@ public class PracticeServiceImpl implements PracticeService {
                 createPracticeStatement(dto, practice);
                 break;
             case WORD:
-                createPracticeWord(dto, practice);
+                createPracticeWord(dto, practice, todayDate);
                 break;
             case CUSTOM:
                 createPracticeCustom(dto, practice);
                 break;
         }
+
+        //연속 학습 일수
+        log.info(lastPracticeDate.toString());
+         if(  lastPracticeDate == null || lastPracticeDate.isEqual(todayDate.minusDays(1)) ) {
+            log.info("yesterday");
+            member.setAttendance_count(member.getAttendance_count() + 1);
+            memberRepository.save(member);
+        }else if( !lastPracticeDate.isEqual(todayDate) ){
+            log.info("not today or yesterday");
+            member.setAttendance_count(1);
+            memberRepository.save(member);
+        }
+
         return practiceRepository.save(practice);
     }
 
-    private void createPracticeStatement(PracticedRequestDto dto, Practice practice) {
+    private void createPracticeStatement(PracticeRequestDto dto, Practice practice) {
         Statement state = statementRepository.findById(dto.getFk())
                 .orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
 
@@ -111,14 +127,15 @@ public class PracticeServiceImpl implements PracticeService {
         practice.setPitchY(userGraph.getPitch_y().toString());
         practice.setPitchLength(userGraph.getPitch_length());
         practice.setScore(score);
-    };
+    }
 
-    private void createPracticeWord(PracticedRequestDto dto, Practice practice) {
+    private void createPracticeWord(PracticeRequestDto dto, Practice practice, LocalDate todayDate) {
         Word word = wordRepository.findById(dto.getFk())
                 .orElseThrow(()->new CustomException(WORD_NOT_FOUND));
-    };
+        practice.setPitchLength(LocalTime.now().getNano());
+    }
 
-    private void  createPracticeCustom(PracticedRequestDto dto, Practice practice) {
+    private void  createPracticeCustom(PracticeRequestDto dto, Practice practice) {
         Custom custom = customRepository.findById(dto.getFk())
                 .orElseThrow(()->new CustomException(CUSTOM_NOT_FOUND));
 
@@ -141,7 +158,7 @@ public class PracticeServiceImpl implements PracticeService {
         practice.setPitchY(userGraph.getPitch_y().toString());
         practice.setPitchLength(userGraph.getPitch_length());
         practice.setScore(score);
-    };
+    }
 
     private PitchGraphDto getPitchGraph(Resource resource){
         PitchGraphDto graphDto = webClient.post()
@@ -185,12 +202,12 @@ public class PracticeServiceImpl implements PracticeService {
         return score;
     }
 
-    public PracticedResponseDto read(ReferenceType type, Long fk, Long memberId){
+    public PracticeResponseDto read(ReferenceType type, Long fk, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(MEMBER_NOT_FOUND));
 
         Practice practice = practiceRepository.findByMemberAndTypeAndFk(member, type, fk).orElseThrow(()->new CustomException(PRACTICED_NOT_FOUND));
 
-        return new PracticedResponseDto(practice);
+        return new PracticeResponseDto(practice);
     }
 
     public Resource getRecord(ReferenceType type, Long fk, Long memberId){
@@ -204,5 +221,12 @@ public class PracticeServiceImpl implements PracticeService {
                 return "audio.wav";
             }
         };
+    }
+
+    public LocalDate getLastPracticeDate(Member member) {
+        Practice practice = practiceRepository.findFirstByMemberOrderByModifiedDateDesc(member)
+                        .orElse(null);
+
+        return practice != null ? practice.getModifiedDate().toLocalDate() : null;
     }
 }

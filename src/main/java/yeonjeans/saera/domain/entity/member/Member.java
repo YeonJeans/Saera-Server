@@ -44,6 +44,9 @@ public class Member extends BaseTimeEntity {
     @Column
     private int xp;
 
+    @Column
+    private int attendance_count;
+
     public void setNickname(String name) {
         this.name = name;
     }
@@ -51,6 +54,10 @@ public class Member extends BaseTimeEntity {
     public void setProfile(String profileUrl) {
         this.profileUrl = profileUrl;
     }
+
+    public void setAttendance_count(int count) {
+        this.attendance_count = count;
+    };
 
     public void addXp(int xp) {
         this.xp = this.xp + xp;

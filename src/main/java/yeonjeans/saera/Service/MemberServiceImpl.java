@@ -7,11 +7,13 @@ import yeonjeans.saera.domain.repository.member.LoginRepository;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
+import yeonjeans.saera.dto.PracticeDaysResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.jwt.TokenProvider;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -20,6 +22,8 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final LoginRepository loginRepository;
     private final TokenProvider tokenProvider;
+
+    private final PracticeServiceImpl practiceService;
 
     @Override
     public TokenResponseDto login(Member request) {
@@ -88,5 +92,21 @@ public class MemberServiceImpl implements MemberService {
 
         member.setNickname(name);
         return new MemberInfoResponseDto(memberRepository.save(member));
+    }
+
+    @Override
+    public PracticeDaysResponseDto getPracticeDays(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        LocalDate todayDate = LocalDate.now();
+        LocalDate lastPracticeDate = practiceService.getLastPracticeDate(member);
+
+        if( lastPracticeDate.isEqual(todayDate) ) {
+            return new PracticeDaysResponseDto(true, member.getAttendance_count());
+        }else if( lastPracticeDate.isEqual(todayDate.minusDays(1)) ) {
+            return new PracticeDaysResponseDto(false, member.getAttendance_count());
+        }else {
+           return new PracticeDaysResponseDto(false, 0);
+        }
     }
 }

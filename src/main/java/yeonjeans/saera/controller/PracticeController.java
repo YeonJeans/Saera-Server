@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.PracticeServiceImpl;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
-import yeonjeans.saera.dto.PracticedRequestDto;
-import yeonjeans.saera.dto.PracticedResponseDto;
+import yeonjeans.saera.dto.PracticeRequestDto;
+import yeonjeans.saera.dto.PracticeResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
@@ -49,7 +49,7 @@ public class PracticeController {
 
     @Operation(summary = "학습 정보 조회", description = "type과 id를 사용하여 학습정보를 제공합니다..", tags = { "Practiced Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticeResponseDto.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -62,25 +62,25 @@ public class PracticeController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        PracticedResponseDto dto = practicedService.read(type, fk, principal.getId());
+        PracticeResponseDto dto = practicedService.read(type, fk, principal.getId());
 
         return ResponseEntity.ok().body(dto);
     }
 
     @Operation(summary = "학습 정보 생성", description = "type과 id를 사용하여 학습 정보를 생성합니다.", tags = { "Practiced Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticedResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticeResponseDto.class))),
                     @ApiResponse(responseCode = "422", description = "음성 파일 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             })
     @PostMapping(value = "/practice", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createPracticed(@ModelAttribute PracticedRequestDto requestDto, @RequestHeader String Authorization) {
+    public ResponseEntity<?> createPracticed(@ModelAttribute PracticeRequestDto requestDto, @RequestHeader String Authorization) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         Practice practice = practicedService.create(requestDto, principal.getId());
-        return ResponseEntity.ok().body(new PracticedResponseDto(practice));
+        return ResponseEntity.ok().body(new PracticeResponseDto(practice));
     }
 }
