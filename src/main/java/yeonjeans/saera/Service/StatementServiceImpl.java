@@ -3,15 +3,14 @@ package yeonjeans.saera.Service;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import reactor.core.publisher.Mono;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
@@ -31,8 +30,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static yeonjeans.saera.exception.ErrorCode.MEMBER_NOT_FOUND;
-import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
+import static yeonjeans.saera.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -108,22 +106,13 @@ public class StatementServiceImpl implements StatementService {
     public Resource getTTS(Long id) {
         Statement statement = statementRepository.findById(id)
                 .orElseThrow(()->new CustomException(STATEMENT_NOT_FOUND));
-        String content = statement.getContent();
 
-        return webClient.post()
-                .uri("https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts")
-                .headers(headers -> {
-                    headers.set("Content-Type", "application/x-www-form-urlencoded");
-                    headers.set("X-NCP-APIGW-API-KEY-ID", CLOVA_ID);
-                    headers.set("X-NCP-APIGW-API-KEY", "2Y0KJ5v5U2eSajYUN7aiJwMXr5E8LuniKct7Vt1S");
-                })
-                .body(BodyInserters.fromFormData
-                                ("speaker", "vhyeri")
-                        .with("text", content)
-                        .with("format", "wav"))
-                .retrieve()
-                .bodyToMono(Resource.class)
-                .block();
+        return new ByteArrayResource(statement.getFile()) {
+            @Override
+            public String getFilename() {
+                return "audio.wav";
+            }
+        };
     }
 
     @Override
