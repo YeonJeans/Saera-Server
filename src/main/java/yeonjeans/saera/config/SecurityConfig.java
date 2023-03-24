@@ -11,11 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.exception.CustomAuthenticationEntryPoint;
 import yeonjeans.saera.exception.ExceptionHandlerFilter;
 import yeonjeans.saera.security.jwt.JwtAuthenticationFilter;
 import yeonjeans.saera.security.jwt.TokenProvider;
+import yeonjeans.saera.util.LoggingFilter;
 
 @AllArgsConstructor
 @Configuration
@@ -24,6 +24,7 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
+    private final LoggingFilter loggingFilter;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(){
@@ -54,10 +55,11 @@ public class SecurityConfig {
 
         http
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
+                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(loggingFilter, exceptionHandlerFilter.getClass());
 
         http.authorizeRequests()
-                .antMatchers("/top5-statement", "/reissue-token", "/words", "/words/record/**", "/statements/record/**", "/today-list", "/auth/**").permitAll()
+                .antMatchers("/top5-statement", "/reissue-token", "/word-id", "/words/record/**", "/statements/record/**", "/today-list", "/auth/**").permitAll()
                 .antMatchers( "/swagger-ui/*").permitAll()
                 .anyRequest().authenticated();
 

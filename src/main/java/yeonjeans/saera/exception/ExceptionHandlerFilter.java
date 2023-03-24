@@ -21,10 +21,10 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request,response);
         } catch (ExpiredJwtException e) {
-            log.info(e.toString());
+            log.error(e.toString());
             setErrorResponse(response, ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException e) {
-            log.info(e.toString());
+            log.error(e.toString());
             setErrorResponse(response, ErrorCode.WRONG_TOKEN);
         } catch (CustomException e){
             setErrorResponse(response, e.getErrorCode());
