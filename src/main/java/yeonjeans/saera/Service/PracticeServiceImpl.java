@@ -36,9 +36,7 @@ import static yeonjeans.saera.util.XPConstant.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -90,13 +88,10 @@ public class PracticeServiceImpl implements PracticeService {
         }
 
         //연속 학습 일수
-        log.info(lastPracticeDate.toString());
          if(  lastPracticeDate == null || lastPracticeDate.isEqual(todayDate.minusDays(1)) ) {
-            log.info("yesterday");
             member.setAttendance_count(member.getAttendance_count() + 1);
             memberRepository.save(member);
         }else if( !lastPracticeDate.isEqual(todayDate) ){
-            log.info("not today or yesterday");
             member.setAttendance_count(1);
             memberRepository.save(member);
         }

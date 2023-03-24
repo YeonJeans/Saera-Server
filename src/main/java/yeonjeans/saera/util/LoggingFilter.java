@@ -22,11 +22,16 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("in LoggingFilter");
-
         if (isAsyncDispatch(request)) {
             filterChain.doFilter(request, response);
-        } else {
+        } else if( request.getContentType() != null) {
+            if(MediaType.valueOf(request.getContentType()).getSubtype().equals("form-data"))
+                doFilterWrapped(request, new ResponseWrapper(response), filterChain);
+            else{
+                doFilterWrapped(new RequestWrapper(request), new ResponseWrapper(response), filterChain);
+            }
+        }
+        else {
             doFilterWrapped(new RequestWrapper(request), new ResponseWrapper(response), filterChain);
         }
     }
@@ -34,6 +39,21 @@ public class LoggingFilter extends OncePerRequestFilter {
     protected void doFilterWrapped(RequestWrapper request, ContentCachingResponseWrapper response, FilterChain filterChain) throws ServletException, IOException {
         try {
             logRequest(request);
+            filterChain.doFilter(request, response);
+        } finally {
+            logResponse(response);
+            response.copyBodyToResponse();
+        }
+    }
+
+    protected void doFilterWrapped(HttpServletRequest request, ContentCachingResponseWrapper response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String queryString = request.getQueryString();
+            log.info("Request : {} uri=[{}] content-type=[{}]",
+                    request.getMethod(),
+                    queryString == null ? request.getRequestURI() : request.getRequestURI() + queryString,
+                    request.getContentType()
+            );
             filterChain.doFilter(request, response);
         } finally {
             logResponse(response);
