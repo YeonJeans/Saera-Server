@@ -70,7 +70,12 @@ public class TokenProvider {
     }
 
     private Claims parseClaims(String token) throws JwtException, IllegalArgumentException {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        }catch(MalformedJwtException e) {
+            log.error("[in parseClaims] token: {} ", token);
+            throw e;
+        }
     }
 
     public boolean validateToken(String token){
@@ -79,7 +84,7 @@ public class TokenProvider {
         }catch (ExpiredJwtException expiredJwtException){
             throw new CustomException(ErrorCode.EXPIRED_TOKEN);
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error("[in validateToken] refreshToken: {}", token);
             throw new CustomException(ErrorCode.WRONG_TOKEN);
         }
         return true;
