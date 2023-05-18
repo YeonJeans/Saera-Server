@@ -20,8 +20,6 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class GoogleOAuth implements SocialOAuth {
-    @Value("${social.google.url}")
-    private String GOOGLE_BASE_URL;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String GOOGLE_CLIENT_ID;
     @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")

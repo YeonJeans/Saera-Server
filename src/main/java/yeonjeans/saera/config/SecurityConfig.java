@@ -48,8 +48,8 @@ public class SecurityConfig {
 //        http
 //                .exceptionHandling()
 //                .authenticationEntryPoint(customAuthenticationEntryPoint);
-//        http.formLogin();
-//        http.oauth2Login();
+        http.formLogin();
+        http.oauth2Login();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -59,8 +59,10 @@ public class SecurityConfig {
                 .addFilterBefore(loggingFilter, exceptionHandlerFilter.getClass());
 
         http.authorizeRequests()
-                .antMatchers("/top5-statement", "/reissue-token", "/word-id", "/words/record/**", "/statements/record/**", "/today-list", "/auth/**").permitAll()
-                .antMatchers( "/swagger-ui/*").permitAll()
+                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated();
 
         return http.build();
