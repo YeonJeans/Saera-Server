@@ -96,7 +96,9 @@ public class CustomServiceImpl {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Custom custom = customRepository.findById(fk).orElseThrow(()-> new CustomException(ErrorCode.CUSTOM_NOT_FOUND));
-
+        if(custom.getIsPublic()){
+            throw new CustomException(ErrorCode.PUBLIC_CANT_DEL);
+        }
         List<CustomCtag> ctList = customCTagRepository.findAllByCustom(custom);
         customCTagRepository.deleteAll(ctList);
 

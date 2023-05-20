@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     /*400 BAD_REQUEST*/
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 누락된 값이 없는 지 확인해주세요."),
+    PUBLIC_CANT_DEL(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 공개된 사용자 정의 문장은 삭제할 수 없습니다."),
 
     /* 401 Unauthorized: 인증 실패*/
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"만료된 토큰입니다."), //ExceptionHandlerFilter에서 499Code로 리턴됨.
