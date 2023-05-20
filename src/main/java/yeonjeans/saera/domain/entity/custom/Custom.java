@@ -24,6 +24,9 @@ public class Custom {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private Boolean isPublic;
+
     @Column(columnDefinition = "MEDIUMBLOB")
     private byte[] file;
 
@@ -49,5 +52,10 @@ public class Custom {
         this.pitchY = pitchY;
         this.file = file;
         this.member = member;
+        this.isPublic = false;
+    }
+
+    public void setIsPublic(Boolean isPublic){
+        this.isPublic = isPublic;
     }
 }
