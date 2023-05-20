@@ -44,9 +44,7 @@ public class ListItemDto {
 
             this.id = custom.getId();
             this.content = custom.getContent();
-            this.tags = custom.getTags().stream()
-                    .map(customCtag -> customCtag.getTag().getName())
-                    .collect(Collectors.toList());
+            this.tags = null;
         }
     }
 

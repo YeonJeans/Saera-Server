@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import yeonjeans.saera.security.dto.AuthMember;
 import java.util.ArrayList;
 import java.util.List;
 
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 @RestController
 public class CustomController {
@@ -45,7 +47,26 @@ public class CustomController {
         return ResponseEntity.ok().body(dto);
     }
 
-    @Operation(summary = "사용자 정의 문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 사용자 정의 문장 리스트를 검색합니다.", tags = { "Custom Controller" },
+    @Operation(summary = "사용자 정의 문장 공개 설정", description = "사용자 정의 문장을 공개 설정합니다.", tags = { "Custom Controller" },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = CustomResponseDto.class))),
+                    @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            }
+    )
+    @PostMapping("/customs/set-public")
+    public ResponseEntity<?> setPublic(
+            @RequestParam(value = "사용자 정의 문장 id", required = true) Long id,
+            @RequestHeader String Authorization
+    ){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        CustomResponseDto dto =  customService.setPublic(id, principal.getId());
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(summary = "사용자 정의 문장 리스트 조회", description = "문장 내용(content)나 tag이름을 이용하여 사용자 정의 문장 리스트를 조회합니다.", tags = { "Custom Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = { @Content(array = @ArraySchema(schema = @Schema(implementation = ListItemDto.class)))}),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -54,6 +75,7 @@ public class CustomController {
     )
     @GetMapping("/customs")
     public ResponseEntity<?> returnCustomList(
+            @RequestParam(value = "isPublic", defaultValue = "false") boolean isPublic,
             @RequestParam(value = "bookmarked", defaultValue = "false") boolean bookmarked,
             @RequestParam(value = "content", required = false) String content,
             @RequestParam(value = "tags", required= false) ArrayList<String> tags,
@@ -62,13 +84,18 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        List<ListItemDto> list;
-        list = customService.getCustoms(bookmarked, content, tags, principal.getId());
+        if(isPublic){
+            List<ListItemDto> list;
+            list = customService.getPublicCustoms(content, principal.getId());
+            return ResponseEntity.ok().body(list);
+        }
 
+        List<CustomListItemDto> list;
+        list = customService.getCustoms(bookmarked, content, tags, principal.getId());
         return ResponseEntity.ok().body(list);
     }
 
-    @Operation(summary = "사용자 정의 문장 조회", description = "문장 내용(content), tag들을 이용해 사용자 정의 문장을 생성합니다.", tags = { "Custom Controller" },
+    @Operation(summary = "사용자 정의 문장 조회", description = "문장 내용(content), tag들을 이용해 사용자 정의 문장을 조회합니다.", tags = { "Custom Controller" },
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = CustomResponseDto.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

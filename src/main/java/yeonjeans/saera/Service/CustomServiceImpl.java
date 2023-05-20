@@ -22,6 +22,7 @@ import yeonjeans.saera.domain.repository.custom.CTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomCTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
+import yeonjeans.saera.dto.CustomListItemDto;
 import yeonjeans.saera.dto.ListItemDto;
 import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.CustomResponseDto;
@@ -83,10 +84,11 @@ public class CustomServiceImpl {
 
         List<CTag> tagList = tags.stream().map(ctag->saveTag(ctag, member)).collect(Collectors.toList());
 
-        List<CustomCtag> relrationList = tagList.stream().map(cTag -> new CustomCtag(custom, cTag)).collect(Collectors.toList());
-        customCTagRepository.saveAll(relrationList);
+        List<CustomCtag> relationList = tagList.stream().map(cTag -> new CustomCtag(custom, cTag)).collect(Collectors.toList());
+        customCTagRepository.saveAll(relationList);
 
-        return new CustomResponseDto(customRepository.save(custom));
+        Boolean isDuplicate = customRepository.existsByContentAndIsPublicTrue(content);
+        return new CustomResponseDto(customRepository.save(custom), isDuplicate);
     }
 
     @Transactional
@@ -94,7 +96,9 @@ public class CustomServiceImpl {
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Custom custom = customRepository.findById(fk).orElseThrow(()-> new CustomException(ErrorCode.CUSTOM_NOT_FOUND));
-
+        if(custom.getIsPublic()){
+            throw new CustomException(ErrorCode.PUBLIC_CANT_DEL);
+        }
         List<CustomCtag> ctList = customCTagRepository.findAllByCustom(custom);
         customCTagRepository.deleteAll(ctList);
 
@@ -116,6 +120,21 @@ public class CustomServiceImpl {
     }
 
     public CustomResponseDto read(Long id, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        List<Object[]> list = customRepository.findByIdWithBookmarkAndPractice(member, id);
+        if(list.isEmpty()) throw new CustomException(CUSTOM_NOT_FOUND);
+        Object[] result = list.get(0);
+
+        Custom custom = result[0] instanceof Custom ? ((Custom) result[0]) : null;
+        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
+        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
+
+        return new CustomResponseDto(custom, bookmark, practice);
+    }
+
+    public CustomResponseDto setPublic(Long id, Long memberId){
         Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         List<Object[]> list = customRepository.findByIdWithBookmarkAndPractice(member, id);
@@ -125,6 +144,9 @@ public class CustomServiceImpl {
         Custom custom = result[0] instanceof Custom ? ((Custom) result[0]) : null;
         Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
         Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
+
+        custom.setIsPublic(Boolean.TRUE);
+        customRepository.save(custom);
 
         return new CustomResponseDto(custom, bookmark, practice);
     }
@@ -184,7 +206,7 @@ public class CustomServiceImpl {
         return audioBytes;
     }
 
-    public List<ListItemDto> getCustoms(boolean bookmarked, String content, ArrayList<String> tags, Long memberId) {
+    public List<CustomListItemDto> getCustoms(boolean bookmarked, String content, ArrayList<String> tags, Long memberId) {
     Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Stream<Object[]> stream;
@@ -199,6 +221,19 @@ public class CustomServiceImpl {
             stream = customRepository.findAllByContentContaining(member,'%'+content+'%').stream();
         }else{
             stream = searchByTagList(tags, member);
+        }
+        return stream.map(CustomListItemDto::new).collect(Collectors.toList());
+    }
+
+    public List<ListItemDto> getPublicCustoms(String content, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Stream<Object[]> stream;
+        if (content == null) {
+            stream = customRepository.findAllByIsPublicTrueWithBookmarkAndPractice(member).stream();
+        } else {
+            stream = customRepository.findAllByIsPublicTrueAndContentContaining(member, '%'+content+'%').stream();
         }
         return stream.map(ListItemDto::new).collect(Collectors.toList());
     }
