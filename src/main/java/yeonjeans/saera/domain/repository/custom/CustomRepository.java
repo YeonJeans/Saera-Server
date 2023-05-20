@@ -51,4 +51,22 @@ public interface CustomRepository extends JpaRepository<Custom, Long> {
             "JOIN CustomCtag ct ON c.id = ct.custom.id AND ct.tag.id IN "+
             "(SELECT t.id FROM CTag t WHERE t.name IN :tagnameList)")
     List<Long> findAllByTagnameIn(@Param("tagnameList") ArrayList<String> tagnameList);
+
+
+    Boolean existsByContentAndIsPublicTrue(String content);
+
+    @Query("SELECT c, b, p " +
+            "FROM Custom c " +
+            "LEFT JOIN Bookmark b ON c.id = b.fk AND b.type = 2 AND b.member = :member " +
+            "LEFT JOIN Practice p ON c.id = p.fk AND p.type = 2 AND p.member = :member " +
+            "WHERE c.isPublic = true")
+    List<Object[]> findAllByIsPublicTrueWithBookmarkAndPractice(@Param("member")Member member);
+
+
+    @Query("SELECT c, b, p " +
+            "FROM Custom c " +
+            "LEFT JOIN Bookmark b ON c.id = b.fk AND b.type = 2 AND b.member = :member " +
+            "LEFT JOIN Practice p ON c.id = p.fk AND p.type = 2 AND p.member = :member " +
+            "WHERE c.content LIKE :content AND c.isPublic = true")
+    List<Object[]> findAllByIsPublicTrueAndContentContaining(@Param("member")Member member, @Param("content") String content);
 }

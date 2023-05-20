@@ -33,6 +33,15 @@ public class CustomRepositoryTest {
         }
     }
 
+    @Test
+    private void checkDuplicate(){
+        String testContent = "가가";
+        Boolean result = customRepository.existsByContentAndIsPublicTrue(testContent);
+
+        System.out.println(result+"hi");
+        Assertions.assertNotNull(result);
+    }
+
     private void printObject(Object[] objects) {
         System.out.println(objects.length);
 

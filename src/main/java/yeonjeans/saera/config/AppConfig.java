@@ -9,7 +9,7 @@ public class AppConfig {
 
     @Bean
     public String MLserverBaseUrl(){
-        return "http://34.64.207.59/";
+        return "http://34.64.46.101/";
     }
 
     @Bean
