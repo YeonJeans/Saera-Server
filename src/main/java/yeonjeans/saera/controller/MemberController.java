@@ -6,12 +6,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
+import yeonjeans.saera.dto.MemberUpdateRequestDto;
 import yeonjeans.saera.dto.PracticeDaysResponseDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
@@ -48,15 +50,15 @@ public class MemberController {
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
-    @PatchMapping("/member")
+    @PatchMapping(value="/member", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMemberInfo(
-            @RequestBody(required = true) String name,
+            @ModelAttribute MemberUpdateRequestDto requestDto,
             @RequestHeader String Authorization
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        MemberInfoResponseDto dto = memberService.updateMember(principal.getId(), name);
+        MemberInfoResponseDto dto = memberService.updateMember(principal.getId(), requestDto);
         return ResponseEntity.ok().body(dto);
     }
 

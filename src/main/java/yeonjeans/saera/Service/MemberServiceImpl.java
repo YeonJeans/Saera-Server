@@ -7,12 +7,14 @@ import yeonjeans.saera.domain.repository.member.LoginRepository;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.MemberInfoResponseDto;
+import yeonjeans.saera.dto.MemberUpdateRequestDto;
 import yeonjeans.saera.dto.PracticeDaysResponseDto;
 import yeonjeans.saera.dto.TokenResponseDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.security.jwt.TokenProvider;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ public class MemberServiceImpl implements MemberService {
     private final TokenProvider tokenProvider;
 
     private final PracticeServiceImpl practiceService;
+    private final StorageService storageService;
 
     @Override
     public TokenResponseDto login(Member request) {
@@ -87,10 +90,21 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberInfoResponseDto updateMember(Long id, String name) {
+    public MemberInfoResponseDto updateMember(Long id, MemberUpdateRequestDto requestDto) {
         Member member = memberRepository.findById(id).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        member.setNickname(name);
+        if(requestDto.getImage()!=null){
+            try {
+                String url = storageService.updateMemberInfo(requestDto.getImage(), id);
+                member.setProfile(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(requestDto.getNickname()!=null){
+            member.setNickname(requestDto.getNickname());
+        }
+
         return new MemberInfoResponseDto(memberRepository.save(member));
     }
 
