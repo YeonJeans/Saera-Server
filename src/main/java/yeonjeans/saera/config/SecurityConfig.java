@@ -47,8 +47,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //        http
 //                .exceptionHandling()
-//                .authenticationEntryPoint(customAuthenticationEntryPoint);
-        http.formLogin();
+//                .authenticationEntryPoint(customAuthenticationEntryPoint);http.formLogin();
         http.oauth2Login();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -59,7 +58,7 @@ public class SecurityConfig {
                 .addFilterBefore(loggingFilter, exceptionHandlerFilter.getClass());
 
         http.authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/auth/**", "/reissue-token").permitAll()
                 .antMatchers("/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html").permitAll()

@@ -55,6 +55,7 @@ public class MemberController {
             @ModelAttribute MemberUpdateRequestDto requestDto,
             @RequestHeader String Authorization
     ) {
+        System.out.println("?");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
