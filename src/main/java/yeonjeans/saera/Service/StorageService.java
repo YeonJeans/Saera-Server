@@ -18,6 +18,8 @@ import java.util.UUID;
 public class StorageService {
     @Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
+    @Value("${profile.default}")
+    private String default_profile;
     private final MemberRepository memberRepository;
     private final Storage storage;
 
@@ -29,7 +31,7 @@ public class StorageService {
         String uuid = UUID.randomUUID().toString();
         String contentType = file.getContentType();
 
-        checkContentType(contentType);
+        //checkContentType(contentType);
         deleteProfilePicture(member.getProfileUrl());
 
         BlobId blobId = BlobId.of(bucketName, uuid);
@@ -48,6 +50,7 @@ public class StorageService {
     }
 
     private void deleteProfilePicture(String profileUrl) {
+        if(profileUrl.equals(default_profile)) return;
         if(!profileUrl.startsWith("https://storage.googleapis.com")) return;
         int start = profileUrl.lastIndexOf('/');
         int end = profileUrl.lastIndexOf('?');
