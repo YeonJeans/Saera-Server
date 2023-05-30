@@ -56,7 +56,8 @@ public class AuthController {
 
     @Operation(summary = "애플로그인 후 토큰 발급",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = TokenResponseDto.class)))
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = TokenResponseDto.class))),
+                    @ApiResponse(responseCode = "401", description = "애플의 id token 검증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             }
     )
     @PostMapping(value = "/auth/apple/callback")
