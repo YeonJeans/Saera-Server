@@ -31,4 +31,8 @@ public class AppleUser {
         member.addMemberRole(MemberRole.USER);
         return member;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

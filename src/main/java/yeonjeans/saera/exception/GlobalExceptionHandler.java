@@ -29,4 +29,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return ErrorResponse.toResponseEntity(ErrorCode.EXCEED_FILE_SIZE);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
+        return ErrorResponse.toResponseEntity(ErrorCode.BAD_REQUEST);
+    }
 }

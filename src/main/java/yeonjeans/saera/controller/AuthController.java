@@ -63,7 +63,7 @@ public class AuthController {
     public ResponseEntity<?> callbackApple(
             @RequestBody AppleUser requestDto) {
 
-        oAuthService.verifyAppleUserInfo(requestDto);
+        String email = oAuthService.getUserInfo(requestDto);
 
         Member member;
         TokenResponseDto dto;
@@ -76,7 +76,9 @@ public class AuthController {
         }
         //join
         else{
-            if(requestDto.getName()==null) throw new CustomException(ErrorCode.BAD_REQUEST);
+            if(requestDto.getName()==null)
+                requestDto.setName(email.substring(0, 7));
+
             member = requestDto.toMember();
             dto = memberService.join(member);
         }

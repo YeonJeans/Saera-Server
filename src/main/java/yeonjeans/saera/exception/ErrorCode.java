@@ -24,6 +24,7 @@ public enum ErrorCode {
     WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰 형식입니다."),
     REISSUE_FAILURE(HttpStatus.UNAUTHORIZED, "토큰 재발급에 실패했습니다."),
     BEARER_ERROR(HttpStatus.UNAUTHORIZED, "BEARER TOKEN 형식으로 요청해야 합니다."),
+    APPLE_AUTH_ERROR(HttpStatus.UNAUTHORIZED, "id token 검증에 실패했습니다."),
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, ""),
 
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */
