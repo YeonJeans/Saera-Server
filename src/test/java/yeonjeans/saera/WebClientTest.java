@@ -51,7 +51,7 @@ public class WebClientTest {
 
     @Test
     public void getPitch() throws IOException {
-        Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
+        Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\1.wav");
 
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
@@ -83,13 +83,12 @@ public class WebClientTest {
                 .block();
 
         Double dtwScore= new JSONObject(response).getDouble("DTW_score");
-        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
         Assertions.assertNotNull(dtwScore);
     }
 
     @Test
     public void getGraphAndScoreTest(){
-        Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\example.wav");
+        Resource resource = new FileSystemResource("C:\\Users\\wndms\\Downloads\\1.wav");
         PitchGraphDto dto = webClient.post()
                 .uri(MLserverBaseUrl+"pitch-graph")
                 .header("access-token", ML_SECRET)
@@ -112,7 +111,6 @@ public class WebClientTest {
                 .block();
 
         Double dtwScore= new JSONObject(response).getDouble("DTW_score");
-        Double mapeScore = new JSONObject(response).getDouble("MAPE_score");
         Assertions.assertNotNull(dtwScore);
     }
 
