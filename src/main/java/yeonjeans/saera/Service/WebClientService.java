@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
@@ -56,16 +58,28 @@ public class WebClientService {
         return score;
     }
 
-    public String getWordScore(String notation, Resource resource){
-        String response = webClient.post()
-                .uri(MLserverBaseUrl + "/word-score?target_word="+notation)
-                .header("access-token", ML_SECRET)
-                .body(BodyInserters.fromMultipartData("audio", resource))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+    public Boolean getWordScore(String notation, MultipartFile record){
+        try{
+            byte[] audioBytes = StreamUtils.copyToByteArray(record.getInputStream());
+            ByteArrayResource audioResource = new ByteArrayResource(audioBytes) {
+                @Override
+                public String getFilename() {
+                    return "audio.wav";
+                }
+            };
+            String response = webClient.post()
+                    .uri(MLserverBaseUrl + "/word-score?target_word="+notation)
+                    .header("access-token", ML_SECRET)
+                    .body(BodyInserters.fromMultipartData("audio", audioResource))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        return response;
+            return new JSONObject(response).getBoolean("result");
+        }catch(IOException ignored){
+
+        }
+            return false;
     }
 
     public PitchGraphDto getPitchGraph(Resource resource){
