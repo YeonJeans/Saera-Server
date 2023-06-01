@@ -48,7 +48,7 @@ public class SecurityConfig {
 //        http
 //                .exceptionHandling()
 //                .authenticationEntryPoint(customAuthenticationEntryPoint);http.formLogin();
-        http.oauth2Login();
+//        http.oauth2Login();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
