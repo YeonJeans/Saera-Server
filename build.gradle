@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'yeonjeans'
-version = '0.0.20-SNAPSHOT'
+version = '0.0.22'
 sourceCompatibility = '11'
 
 repositories {
@@ -18,7 +18,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	implementation 'org.projectlombok:lombok:1.18.20'
+	annotationProcessor 'org.projectlombok:lombok'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
