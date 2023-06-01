@@ -84,14 +84,14 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        if(isPublic){
-            List<ListItemDto> list;
-            list = customService.getPublicCustoms(content, principal.getId());
-            return ResponseEntity.ok().body(list);
-        }
-
         List<CustomListItemDto> list;
-        list = customService.getCustoms(bookmarked, content, tags, principal.getId());
+        if(isPublic){
+            list = customService.getPublicCustoms(content, principal.getId());
+        }else if(bookmarked){
+            list = customService.getBookmarkedCustoms(principal.getId());
+        }else{
+            list = customService.getCustoms(content, tags, principal.getId());
+        }
         return ResponseEntity.ok().body(list);
     }
 
