@@ -16,6 +16,7 @@ public enum ErrorCode {
     /*400 BAD_REQUEST*/
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 누락된 값이 없는 지 확인해주세요."),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. image파일만 업로드 가능합니다."),
+    EXCEED_FILE_SIZE(HttpStatus.BAD_REQUEST, "5MB이하의 이미지 파일만 업로드할 수 있습니다."),
     PUBLIC_CANT_DEL(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 공개된 사용자 정의 문장은 삭제할 수 없습니다."),
 
     /* 401 Unauthorized: 인증 실패*/
@@ -23,6 +24,7 @@ public enum ErrorCode {
     WRONG_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰 형식입니다."),
     REISSUE_FAILURE(HttpStatus.UNAUTHORIZED, "토큰 재발급에 실패했습니다."),
     BEARER_ERROR(HttpStatus.UNAUTHORIZED, "BEARER TOKEN 형식으로 요청해야 합니다."),
+    APPLE_AUTH_ERROR(HttpStatus.UNAUTHORIZED, "id token 검증에 실패했습니다."),
     ACCESS_DENIED(HttpStatus.UNAUTHORIZED, ""),
 
     /* 404 NOT_FOUND : Resource 를 찾을 수 없음 */

@@ -7,15 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import yeonjeans.saera.Service.MemberService;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.entity.member.Platform;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.TokenResponseDto;
+import yeonjeans.saera.dto.oauth.AppleUser;
 import yeonjeans.saera.dto.oauth.GoogleUser;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
@@ -38,8 +36,7 @@ public class AuthController {
     public ResponseEntity<?> callback(
             @RequestParam(name = "code") String code) {
 
-        GoogleUser userInfo = oAuthService.getUserInfo(Platform.GOOGLE, code);
-
+        GoogleUser userInfo = oAuthService.getUserInfo(code);
         Member member;
         TokenResponseDto dto;
         Boolean isExist = memberRepository.existsByEmailAndPlatform(userInfo.getEmail(), Platform.GOOGLE);
@@ -52,6 +49,38 @@ public class AuthController {
         //join
         else{
             member = userInfo.toMember();
+            dto = memberService.join(member);
+        }
+        return ResponseEntity.ok().body(dto);
+    }
+
+    @Operation(summary = "애플로그인 후 토큰 발급",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = TokenResponseDto.class))),
+                    @ApiResponse(responseCode = "401", description = "애플의 id token 검증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            }
+    )
+    @PostMapping(value = "/auth/apple/callback")
+    public ResponseEntity<?> callbackApple(
+            @RequestBody AppleUser requestDto) {
+
+        String email = oAuthService.getUserInfo(requestDto);
+
+        Member member;
+        TokenResponseDto dto;
+        Boolean isExist = memberRepository.existsByEmailAndPlatform(requestDto.getIdentifier(), Platform.APPLE);
+
+        //login
+        if(isExist){
+            member = memberRepository.findByEmailAndPlatform(requestDto.getIdentifier(), Platform.APPLE).get();
+            dto = memberService.login(member);
+        }
+        //join
+        else{
+            if(requestDto.getName()==null)
+                requestDto.setName(email.substring(0, 7));
+
+            member = requestDto.toMember();
             dto = memberService.join(member);
         }
         return ResponseEntity.ok().body(dto);

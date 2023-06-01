@@ -3,6 +3,7 @@ package yeonjeans.saera.exception;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,7 +27,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (JwtException e) {
             log.error(e.toString());
             setErrorResponse(response, ErrorCode.WRONG_TOKEN);
-        } catch (CustomException e){
+        }catch (CustomException e){
             setErrorResponse(response, e.getErrorCode());
         }
     }

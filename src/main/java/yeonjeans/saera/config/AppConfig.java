@@ -1,6 +1,5 @@
 package yeonjeans.saera.config;
 
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 @Configuration
@@ -20,7 +18,7 @@ public class AppConfig {
 
     @Bean
     public String MLserverBaseUrl(){
-        return "http://34.64.46.101/";
+        return "http://34.22.92.172//";
     }
 
     @Bean

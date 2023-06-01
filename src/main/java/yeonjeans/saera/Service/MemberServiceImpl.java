@@ -1,6 +1,7 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import yeonjeans.saera.domain.entity.member.Login;
 import yeonjeans.saera.domain.repository.member.LoginRepository;
@@ -28,6 +29,9 @@ public class MemberServiceImpl implements MemberService {
     private final PracticeServiceImpl practiceService;
     private final StorageService storageService;
 
+    @Value("${profile.default}")
+    private String default_profile;
+
     @Override
     public TokenResponseDto login(Member request) {
         TokenResponseDto dto = tokenProvider.generateToken(request.getId(), request.getName());
@@ -37,6 +41,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public TokenResponseDto join(Member request) {
+        if(request.getProfileUrl()==null) request.setProfile(default_profile);
+
         Member member = memberRepository.save(request);
         TokenResponseDto dto = tokenProvider.generateToken(member.getId(), member.getName());
         saveRefreshToken(request, dto.getRefreshToken());

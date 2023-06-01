@@ -19,7 +19,7 @@ import java.util.Map;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class GoogleOAuth implements SocialOAuth {
+public class GoogleOAuth {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String GOOGLE_CLIENT_ID;
     @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
@@ -31,7 +31,6 @@ public class GoogleOAuth implements SocialOAuth {
 
     RestTemplate restTemplate = new RestTemplate();
 
-    @Override
     public GoogleUser getUserInfo(String code) {
         GoogleUser userInfo;
         try{

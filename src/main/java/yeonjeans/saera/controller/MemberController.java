@@ -45,6 +45,7 @@ public class MemberController {
     @Operation(summary = "유저 정보 수정", description = "Access Token을 이용하여 유저 정보 수정",
             responses = {
                     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = MemberInfoResponseDto.class))),
+                    @ApiResponse(responseCode = "400", description = "파일 크기 초과(5MB) or 빈 body와 요청 시", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -55,6 +56,7 @@ public class MemberController {
             @ModelAttribute MemberUpdateRequestDto requestDto,
             @RequestHeader String Authorization
     ) {
+        System.out.println("?");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
