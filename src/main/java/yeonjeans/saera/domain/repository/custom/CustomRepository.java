@@ -28,8 +28,16 @@ public interface CustomRepository extends JpaRepository<Custom, Long> {
     @Query("SELECT c, b, p " +
             "FROM Custom c " +
             "JOIN Bookmark b ON c.id = b.fk AND b.type = 2 AND b.member = :member " +
-            "LEFT JOIN Practice p ON c.id = p.fk AND p.type = 2 AND p.member = :member ")
-    List<Object[]> findBookmarkedAllAndPractice(@Param("member") Member member);
+            "LEFT JOIN Practice p ON c.id = p.fk AND p.type = 2 AND p.member = :member "+
+            "WHERE c.member = :member")
+    List<Object[]> findBookmarkedAllwithPractice(@Param("member") Member member);
+
+    @Query("SELECT c, b, p " +
+            "FROM Custom c " +
+            "JOIN Bookmark b ON c.id = b.fk AND b.type = 2 AND b.member = :member " +
+            "LEFT JOIN Practice p ON c.id = p.fk AND p.type = 2 AND p.member = :member "+
+            "WHERE c.member <> :member")
+    List<Object[]> findBookmarkedAllByMemberNotwithPractice(@Param("member") Member member);
 
     @Query("SELECT c, b, p " +
             "FROM Custom c " +
