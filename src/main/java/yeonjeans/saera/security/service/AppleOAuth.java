@@ -57,11 +57,12 @@ public class AppleOAuth {
     }
 
     public void verifyIdToken(Claims claims){
-        if(claims.getAudience().equals(aud)){
+        if(!claims.getAudience().equals(aud)){
             log.info("[in verifyIdToken] aud is not matched");
             throw new CustomException(APPLE_AUTH_ERROR);
         }
-        if(claims.getIssuer().equals("https://appleid.apple.com")){
+        if(!claims.getIssuer().equals("https://appleid.apple.com")){
+            log.info(claims.getIssuer().toString());
             log.info("[in verifyIdToken] iss is not matched");
             throw new CustomException(APPLE_AUTH_ERROR);
         }
