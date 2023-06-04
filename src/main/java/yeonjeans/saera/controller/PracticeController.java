@@ -19,6 +19,7 @@ import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.dto.PracticeRequestDto;
 import yeonjeans.saera.dto.PracticeResponseDto;
+import yeonjeans.saera.dto.PracticeWordDto;
 import yeonjeans.saera.exception.ErrorResponse;
 import yeonjeans.saera.security.dto.AuthMember;
 
@@ -93,7 +94,7 @@ public class PracticeController {
 
     @Operation(summary = "단어 학습 정보 생성", description = "WORD만 됩니다 !!!!!!!", tags = { "Practice Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticeResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = PracticeWordDto.class))),
                     @ApiResponse(responseCode = "422", description = "타입 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "422", description = "음성 파일 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "404", description = "존재하지 않는 리소스 접근", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -105,6 +106,6 @@ public class PracticeController {
 
         Boolean result = practicedService.createWord(dto, principal.getId());
 
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.ok().body(new PracticeWordDto(result));
     }
 }

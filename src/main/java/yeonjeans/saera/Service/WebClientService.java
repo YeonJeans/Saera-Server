@@ -72,12 +72,16 @@ public class WebClientService {
                     .header("access-token", ML_SECRET)
                     .body(BodyInserters.fromMultipartData("audio", audioResource))
                     .retrieve()
+                    .onStatus(HttpStatus::isError, res -> {
+                        if(res.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                            throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
+                        throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                    })
                     .bodyToMono(String.class)
                     .block();
 
             return new JSONObject(response).getBoolean("result");
-        }catch(IOException ignored){
-
+        }catch(IOException e){
         }
             return false;
     }
