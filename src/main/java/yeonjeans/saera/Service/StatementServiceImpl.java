@@ -1,36 +1,31 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
 import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.domain.entity.member.Member;
 import yeonjeans.saera.domain.repository.PracticeRepository;
-import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.domain.repository.example.StatementRepository;
-import yeonjeans.saera.dto.NameIdDto;
+import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.ListItemDto;
+import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.StatementResponseDto;
 import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static yeonjeans.saera.exception.ErrorCode.*;
+import static yeonjeans.saera.exception.ErrorCode.MEMBER_NOT_FOUND;
+import static yeonjeans.saera.exception.ErrorCode.STATEMENT_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -38,15 +33,7 @@ public class StatementServiceImpl implements StatementService {
     private final StatementRepository statementRepository;
     private final MemberRepository memberRepository;
     private final PracticeRepository practiceRepository;
-    private final WebClient webClient;
-
-    private final String MLserverBaseUrl;
-    @Value("${ml.secret}")
-    private String ML_SECRET;
-    @Value("${clova.client-id}")
-    private String CLOVA_ID;
-    @Value("${clova.client-secret}")
-    private String CLOVA_SECRET;
+    private final WebClientService webClient;
 
     @Override
     public StatementResponseDto getStatement(Long id, Long memberId) {
@@ -95,7 +82,7 @@ public class StatementServiceImpl implements StatementService {
 
         if(content != null){
             return Stream.concat(stream.map(ListItemDto::new),
-                    statementRepository.findAllByIdWithBookmarkAndPractice(member, getRecommendList(content))
+                    statementRepository.findAllByIdWithBookmarkAndPractice(member, webClient.getRecommendList(content))
                             .stream().map(item -> new ListItemDto(item, true)))
                     .collect(Collectors.toList());
         }
@@ -133,26 +120,5 @@ public class StatementServiceImpl implements StatementService {
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {
         List<Long> idList = statementRepository.findAllByTagnameIn(tags);
         return statementRepository.findAllByIdWithBookmarkAndPractice(member, idList).stream();
-    }
-
-    private List<Long> getRecommendList(String keyword) {
-        List<Long> recommendIdList = new ArrayList<>();
-        String response = webClient.get()
-                .uri(MLserverBaseUrl+"/semantic-search?query="+keyword)
-                .header("access-token", ML_SECRET)
-                .retrieve()
-                .onStatus(HttpStatus::isError, res -> {
-                    if(res.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
-                        throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
-                    throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
-                })
-                .bodyToMono(String.class)
-                .block();
-
-        recommendIdList.add(new JSONObject(response).getJSONObject("0").getLong("id"));
-        recommendIdList.add(new JSONObject(response).getJSONObject("1").getLong("id"));
-        recommendIdList.add(new JSONObject(response).getJSONObject("2").getLong("id"));
-
-        return recommendIdList;
     }
 }

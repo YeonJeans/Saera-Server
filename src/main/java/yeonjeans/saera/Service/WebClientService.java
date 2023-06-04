@@ -19,6 +19,8 @@ import yeonjeans.saera.exception.ErrorCode;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +34,27 @@ public class WebClientService {
     private String CLOVA_ID;
     @Value("${clova.client-secret}")
     private String CLOVA_SECRET;
+
+    public List<Long> getRecommendList(String keyword) {
+        List<Long> recommendIdList = new ArrayList<>();
+        String response = webClient.get()
+                .uri(MLserverBaseUrl+"/semantic-search?query="+keyword)
+                .header("access-token", ML_SECRET)
+                .retrieve()
+                .onStatus(HttpStatus::isError, res -> {
+                    if(res.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                        throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
+                    throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                })
+                .bodyToMono(String.class)
+                .block();
+
+        recommendIdList.add(new JSONObject(response).getJSONObject("0").getLong("id"));
+        recommendIdList.add(new JSONObject(response).getJSONObject("1").getLong("id"));
+        recommendIdList.add(new JSONObject(response).getJSONObject("2").getLong("id"));
+
+        return recommendIdList;
+    }
 
     public Double getScore(PitchGraphDto userGraph, PitchGraphDto targetGraph ){
         ScoreRequestDto requestDto = ScoreRequestDto.builder()
