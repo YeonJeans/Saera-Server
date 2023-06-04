@@ -2,41 +2,36 @@ package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
+import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.custom.Custom;
 import yeonjeans.saera.domain.entity.example.ReferenceType;
+import yeonjeans.saera.domain.entity.example.Statement;
 import yeonjeans.saera.domain.entity.example.Word;
 import yeonjeans.saera.domain.entity.member.Member;
+import yeonjeans.saera.domain.repository.PracticeRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
+import yeonjeans.saera.domain.repository.example.StatementRepository;
 import yeonjeans.saera.domain.repository.example.WordRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
-import yeonjeans.saera.domain.entity.Practice;
-import yeonjeans.saera.domain.repository.PracticeRepository;
-import yeonjeans.saera.domain.entity.example.Statement;
-import yeonjeans.saera.domain.repository.example.StatementRepository;
+import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.dto.PracticeRequestDto;
 import yeonjeans.saera.dto.PracticeResponseDto;
-import yeonjeans.saera.dto.ML.PitchGraphDto;
-import yeonjeans.saera.dto.ML.ScoreRequestDto;
 import yeonjeans.saera.exception.CustomException;
-import yeonjeans.saera.exception.ErrorCode;
 import yeonjeans.saera.util.Parsing;
 
-import static yeonjeans.saera.exception.ErrorCode.*;
-import static yeonjeans.saera.util.XPConstant.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import static yeonjeans.saera.exception.ErrorCode.*;
+import static yeonjeans.saera.util.XPConstant.XP_STATEMENT;
+import static yeonjeans.saera.util.XPConstant.XP_WORD;
 
 @Slf4j
 @RequiredArgsConstructor
