@@ -19,7 +19,6 @@ public class CustomResponseDto {
     List<String> tags;
     private Boolean bookmarked;
     private Boolean practiced;
-    private Boolean isDuplicate;
 
     public CustomResponseDto(Custom custom, Bookmark bookmark, Practice practice){
         this.id = custom.getId();
@@ -34,7 +33,7 @@ public class CustomResponseDto {
         this.practiced = practice != null;
     }
 
-    public CustomResponseDto(Custom custom, Boolean isDuplicate){
+    public CustomResponseDto(Custom custom){
         this.id = custom.getId();
         this.content = custom.getContent();
         this.pitch_x = Parsing.stringToIntegerArray(custom.getPitchX());
@@ -44,6 +43,5 @@ public class CustomResponseDto {
 //              .collect(Collectors.toList());
         bookmarked = false;
         practiced = false;
-        this.isDuplicate = isDuplicate;
     }
 }

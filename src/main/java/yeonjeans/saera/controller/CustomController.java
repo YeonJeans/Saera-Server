@@ -43,26 +43,26 @@ public class CustomController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        CustomResponseDto dto =  customService.create(requestDto.getContent(), requestDto.getTags(), principal.getId());
+        CustomResponseDto dto = customService.create(requestDto, principal.getId());
         return ResponseEntity.ok().body(dto);
     }
 
-    @Operation(summary = "사용자 정의 문장 공개 설정", description = "사용자 정의 문장을 공개 설정합니다.", tags = { "Custom Controller" },
+    @Operation(summary = "내가 만든 문장 중복 체크", description = "문장 내용 -> 중복 여부 검사", tags = { "Custom Controller" },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = CustomResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "요청 성공", content = @Content(schema = @Schema(implementation = PracticeWordDto.class))),
                     @ApiResponse(responseCode = "401", description = "인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(responseCode = "499", description = "토큰 만료로 인한 인증 실패", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
             }
     )
-    @PostMapping("/customs/set-public")
+    @GetMapping("/customs/check-unique")
     public ResponseEntity<?> setPublic(
-            @RequestParam(value = "사용자 정의 문장 id", required = true) Long id,
+            @RequestParam(value = "문장 내용", required = true) String content,
             @RequestHeader String Authorization
     ){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
-        CustomResponseDto dto =  customService.setPublic(id, principal.getId());
+        PracticeWordDto dto =  customService.checkUnique(content);
         return ResponseEntity.ok().body(dto);
     }
 
