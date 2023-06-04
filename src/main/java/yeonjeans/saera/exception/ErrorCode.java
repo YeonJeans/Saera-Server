@@ -16,7 +16,6 @@ public enum ErrorCode {
     /*400 BAD_REQUEST*/
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 누락된 값이 없는 지 확인해주세요."),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. image파일만 업로드 가능합니다."),
-    INVALID_TYPE(HttpStatus.BAD_REQUEST, "잘못된 타입의 요청입니다. 학습타입을 확인해주세요."),
     EXCEED_FILE_SIZE(HttpStatus.BAD_REQUEST, "5MB이하의 이미지 파일만 업로드할 수 있습니다."),
     PUBLIC_CANT_DEL(HttpStatus.BAD_REQUEST, "잘못된 요청입니다. 공개된 사용자 정의 문장은 삭제할 수 없습니다."),
 

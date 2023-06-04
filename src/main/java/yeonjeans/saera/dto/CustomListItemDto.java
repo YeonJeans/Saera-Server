@@ -18,33 +18,15 @@ public class CustomListItemDto {
     private Long id;
     private Boolean practiced;
     private Boolean bookmarked;
+    private Boolean recommended;
     private Boolean isPublic;
-    private Boolean isOwner;
-
-    public CustomListItemDto(Object[] result, boolean isOwner) {
-        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
-        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
-        this.practiced = practice != null;
-        this.bookmarked = bookmark != null;
-
-        this.date = practiced ? practice.getModifiedDate() : null;
-
-        Custom custom = ((Custom) result[0]);
-
-        this.id = custom.getId();
-        this.content = custom.getContent();
-        if(isOwner) this.tags = custom.getTags().stream()
-                .map(customCtag -> customCtag.getTag().getName())
-                .collect(Collectors.toList());
-        this.isPublic = custom.getIsPublic();
-        this.isOwner = isOwner;
-    }
 
     public CustomListItemDto(Object[] result) {
         Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
         Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
         this.practiced = practice != null;
         this.bookmarked = bookmark != null;
+        this.recommended = false;
 
         this.date = practiced ? practice.getModifiedDate() : null;
 
@@ -56,6 +38,5 @@ public class CustomListItemDto {
                 .map(customCtag -> customCtag.getTag().getName())
                 .collect(Collectors.toList());
         this.isPublic = custom.getIsPublic();
-        this.isOwner = false;
     }
 }

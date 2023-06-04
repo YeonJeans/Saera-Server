@@ -1,11 +1,15 @@
 package yeonjeans.saera.Service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import yeonjeans.saera.domain.entity.Bookmark;
 import yeonjeans.saera.domain.entity.Practice;
 import yeonjeans.saera.domain.entity.custom.CTag;
@@ -19,12 +23,15 @@ import yeonjeans.saera.domain.repository.custom.CustomCTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
 import yeonjeans.saera.dto.CustomListItemDto;
+import yeonjeans.saera.dto.ListItemDto;
 import yeonjeans.saera.dto.NameIdDto;
 import yeonjeans.saera.dto.CustomResponseDto;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +41,6 @@ import java.util.stream.Stream;
 import static yeonjeans.saera.domain.entity.example.ReferenceType.CUSTOM;
 import static yeonjeans.saera.exception.ErrorCode.CUSTOM_NOT_FOUND;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CustomServiceImpl {
@@ -45,21 +51,28 @@ public class CustomServiceImpl {
     private final PracticeRepository practiceRepository;
     private final BookmarkRepository bookmarkRepository;
 
-    private final WebClientService webClient;
+    private final WebClient webClient;
+    private final String MLserverBaseUrl;
+    @Value("${ml.secret}")
+    private String ML_SECRET;
+    @Value("${clova.client-id}")
+    private String CLOVA_ID;
+    @Value("${clova.client-secret}")
+    private String CLOVA_SECRET;
 
     @Transactional
     public CustomResponseDto create(String content, ArrayList<String> tags, Long memberId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        byte[] audioBytes = webClient.getTTS(content);
+        byte[] audioBytes = getTTS(content);
         ByteArrayResource audioResource = new ByteArrayResource(audioBytes) {
             @Override
             public String getFilename() {
                 return "audio.wav";
             }
         };
-        PitchGraphDto graphDto = webClient.getPitchGraph(audioResource);
+        PitchGraphDto graphDto = getPitchGraph(audioResource);
 
         Custom custom = Custom.builder()
                 .content(content)
@@ -145,11 +158,62 @@ public class CustomServiceImpl {
         return cTagRepository.save(new CTag(tagname, member));
     }
 
-    public List<CustomListItemDto> getCustoms(String content, ArrayList<String> tags, Long memberId) {
+    private PitchGraphDto getPitchGraph(Resource resource){
+        PitchGraphDto graphDto = webClient.post()
+                .uri(MLserverBaseUrl + "pitch-graph")
+                .header("access-token", ML_SECRET)
+                .body(BodyInserters.fromMultipartData("audio", resource))
+                .retrieve()
+                .onStatus(HttpStatus::isError, response -> {
+                    if(response.statusCode() == HttpStatus.UNPROCESSABLE_ENTITY)
+                        throw new CustomException(ErrorCode.UNPROCESSABLE_ENTITY);
+                    throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                })
+                .bodyToMono(PitchGraphDto.class)
+                .block();
+        return graphDto;
+    }
+
+    private byte[] getTTS(String content){
+        Resource resource = webClient.post()
+                .uri("https://naveropenapi.apigw.ntruss.com/tts-premium/v1/tts")
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/x-www-form-urlencoded");
+                    headers.set("X-NCP-APIGW-API-KEY-ID", CLOVA_ID);
+                    headers.set("X-NCP-APIGW-API-KEY", CLOVA_SECRET);
+                })
+                .body(BodyInserters.fromFormData
+                                ("speaker", "vhyeri")
+                        .with("text", content)
+                        .with("format", "wav"))
+                .retrieve()
+                .onStatus(HttpStatus::isError, response -> {
+                    if(response.statusCode() == HttpStatus.BAD_REQUEST)
+                        System.out.println("\n\n[in getTTSfromClova to create Custom] BAD_REQUEST\n\n");
+                    throw new CustomException(ErrorCode.COMMUNICATION_FAILURE);
+                })
+                .bodyToMono(Resource.class)
+                .block();
+
+        byte[] audioBytes = new byte[0];
+        try {
+            InputStream inputStream = resource.getInputStream();
+            audioBytes = StreamUtils.copyToByteArray(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return audioBytes;
+    }
+
+    public List<CustomListItemDto> getCustoms(boolean bookmarked, String content, ArrayList<String> tags, Long memberId) {
     Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Stream<Object[]> stream;
-        if(content==null&&tags==null){
+        if(bookmarked){
+            stream = customRepository.findBookmarkedAllAndPractice(member).stream();
+        }
+        else if(content==null&&tags==null){
             stream = customRepository.findAllWithBookmarkAndPractice(member).stream();
         }else if(content!=null&&tags!=null){
             stream = Stream.concat(customRepository.findAllByContentContaining(member,'%'+content+'%').stream(), searchByTagList(tags, member)).distinct();
@@ -158,10 +222,10 @@ public class CustomServiceImpl {
         }else{
             stream = searchByTagList(tags, member);
         }
-        return stream.map(i->new CustomListItemDto(i, true)).collect(Collectors.toList());
+        return stream.map(CustomListItemDto::new).collect(Collectors.toList());
     }
 
-    public List<CustomListItemDto> getPublicCustoms(String content, Long memberId) {
+    public List<ListItemDto> getPublicCustoms(String content, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -171,21 +235,7 @@ public class CustomServiceImpl {
         } else {
             stream = customRepository.findAllByIsPublicTrueAndContentContaining(member, '%'+content+'%').stream();
         }
-        return stream.map(CustomListItemDto::new).collect(Collectors.toList());
-    }
-
-    public List<CustomListItemDto> getBookmarkedCustoms(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-        Stream<CustomListItemDto> stream = Stream.concat(
-                customRepository.findBookmarkedAllwithPractice(member).stream()
-                .map(i->new CustomListItemDto(i,true)),
-                customRepository.findBookmarkedAllByMemberNotwithPractice(member).stream()
-                .map(i->new CustomListItemDto(i, false))
-            );
-
-        return stream.collect(Collectors.toList());
+        return stream.map(ListItemDto::new).collect(Collectors.toList());
     }
 
     private Stream<Object[]> searchByTagList(ArrayList<String> tags, Member member) {
