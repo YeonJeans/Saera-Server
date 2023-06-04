@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
-
 @Configuration
 public class AppConfig {
     @Value("${spring.cloud.gcp.credentials.location}")
@@ -27,13 +25,7 @@ public class AppConfig {
     }
 
     @Bean
-    public Storage storage() throws IOException {
-//        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialsLocation));
-//        StorageOptions storageOptions = StorageOptions.newBuilder()
-//                .setCredentials(credentials)
-//                .setProjectId(projectId)
-//                .build();
-//        return storageOptions.getService();
+    public Storage storage() {
         return StorageOptions.getDefaultInstance().getService();
     }
 }

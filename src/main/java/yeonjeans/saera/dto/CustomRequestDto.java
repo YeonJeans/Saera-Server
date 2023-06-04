@@ -12,4 +12,5 @@ import java.util.ArrayList;
 public class CustomRequestDto {
     private String content;
     private ArrayList<String> tags;
+    private Boolean setPublic;
 }

@@ -18,9 +18,7 @@ import yeonjeans.saera.domain.repository.custom.CTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomCTagRepository;
 import yeonjeans.saera.domain.repository.custom.CustomRepository;
 import yeonjeans.saera.domain.repository.member.MemberRepository;
-import yeonjeans.saera.dto.CustomListItemDto;
-import yeonjeans.saera.dto.NameIdDto;
-import yeonjeans.saera.dto.CustomResponseDto;
+import yeonjeans.saera.dto.*;
 import yeonjeans.saera.dto.ML.PitchGraphDto;
 import yeonjeans.saera.exception.CustomException;
 import yeonjeans.saera.exception.ErrorCode;
@@ -45,28 +43,36 @@ public class CustomServiceImpl {
     private final PracticeRepository practiceRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    private final StatementServiceImpl statementService;
+
     private final WebClientService webClient;
 
     @Transactional
-    public CustomResponseDto create(String content, ArrayList<String> tags, Long memberId){
+    public CustomResponseDto create(CustomRequestDto dto, Long memberId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
-        byte[] audioBytes = webClient.getTTS(content);
-        ByteArrayResource audioResource = new ByteArrayResource(audioBytes) {
-            @Override
-            public String getFilename() {
-                return "audio.wav";
-            }
-        };
+        String content = dto.getContent();
+        ArrayList<String> tags = dto.getTags();
+        Boolean setPublic = dto.getSetPublic();
+
+//        byte[] audioBytes = webClient.getTTS(content);
+//        ByteArrayResource audioResource = new ByteArrayResource(audioBytes) {
+//            @Override
+//            public String getFilename() {
+//                return "audio.wav";
+//            }
+//        };
+        ByteArrayResource audioResource = (ByteArrayResource) statementService.getTTS(78L);
         PitchGraphDto graphDto = webClient.getPitchGraph(audioResource);
 
         Custom custom = Custom.builder()
                 .content(content)
-                .file(audioBytes)
+                .file(audioResource.getByteArray())
                 .pitchX(graphDto.getPitch_x().toString())
                 .pitchY(graphDto.getPitch_y().toString())
                 .member(member)
+                .isPublic(setPublic)
                 .build();
 
         List<CTag> tagList = tags.stream().map(ctag->saveTag(ctag, member)).collect(Collectors.toList());
@@ -74,8 +80,7 @@ public class CustomServiceImpl {
         List<CustomCtag> relationList = tagList.stream().map(cTag -> new CustomCtag(custom, cTag)).collect(Collectors.toList());
         customCTagRepository.saveAll(relationList);
 
-        Boolean isDuplicate = customRepository.existsByContentAndIsPublicTrue(content);
-        return new CustomResponseDto(customRepository.save(custom), isDuplicate);
+        return new CustomResponseDto(customRepository.save(custom));
     }
 
     @Transactional
@@ -121,21 +126,9 @@ public class CustomServiceImpl {
         return new CustomResponseDto(custom, bookmark, practice);
     }
 
-    public CustomResponseDto setPublic(Long id, Long memberId){
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
-        List<Object[]> list = customRepository.findByIdWithBookmarkAndPractice(member, id);
-        if(list.isEmpty()) throw new CustomException(CUSTOM_NOT_FOUND);
-        Object[] result = list.get(0);
-
-        Custom custom = result[0] instanceof Custom ? ((Custom) result[0]) : null;
-        Bookmark bookmark = result[1] instanceof Bookmark ? ((Bookmark) result[1]) : null;
-        Practice practice = result[2] instanceof Practice ? ((Practice) result[2]) : null;
-
-        custom.setIsPublic(Boolean.TRUE);
-        customRepository.save(custom);
-
-        return new CustomResponseDto(custom, bookmark, practice);
+    public PracticeWordDto checkUnique(String content){
+        Boolean isDuplicate = customRepository.existsByContentAndIsPublicTrue(content);
+        return new PracticeWordDto(!isDuplicate);
     }
 
     private CTag saveTag(String tagname, Member member){

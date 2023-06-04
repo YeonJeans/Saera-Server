@@ -46,16 +46,12 @@ public class Custom {
     private LocalDateTime createdDate;
 
     @Builder
-    public Custom(String content, String pitchX, String pitchY, byte[] file, Member member) {
+    public Custom(String content, String pitchX, String pitchY, byte[] file, Member member, Boolean isPublic) {
         this.content = content;
         this.pitchX = pitchX;
         this.pitchY = pitchY;
         this.file = file;
         this.member = member;
-        this.isPublic = false;
-    }
-
-    public void setIsPublic(Boolean isPublic){
         this.isPublic = isPublic;
     }
 }
